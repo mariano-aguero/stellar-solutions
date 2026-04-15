@@ -105,15 +105,16 @@ export class EmptyBatchError extends StellarKitError {
 }
 
 export class BatchValidationError extends StellarKitError {
-  readonly invalidIndices: number[];
+  readonly invalidIndices: readonly number[];
 
-  constructor(invalidIndices: number[]) {
+  constructor(invalidIndices: readonly number[]) {
+    const copy = [...invalidIndices];
     super(
-      `Batch contains invalid payments at indices: ${invalidIndices.join(', ')}`,
+      `Batch contains invalid payments at indices: ${copy.join(', ')}`,
       'BATCH_VALIDATION_ERROR',
-      { invalidIndices },
+      { invalidIndices: copy },
     );
     this.name = 'BatchValidationError';
-    this.invalidIndices = invalidIndices;
+    this.invalidIndices = copy;
   }
 }

@@ -35,12 +35,16 @@ describe('typed error subclasses', () => {
 
   it('InsufficientFundsError includes available and required', () => {
     const err = new InsufficientFundsError({ available: '5', required: '10' });
+    expect(err).toBeInstanceOf(Error);
+    expect(err.name).toBe('InsufficientFundsError');
     expect(err.code).toBe('INSUFFICIENT_FUNDS');
     expect(err.details).toEqual({ available: '5', required: '10' });
   });
 
   it('NetworkTimeoutError has correct code', () => {
     expect(new NetworkTimeoutError().code).toBe('NETWORK_TIMEOUT');
+    expect(new NetworkTimeoutError()).toBeInstanceOf(Error);
+    expect(new NetworkTimeoutError(5000).message).toContain('5000ms');
   });
 
   it('NoTrustlineError has correct code', () => {
@@ -61,6 +65,8 @@ describe('typed error subclasses', () => {
 
   it('BatchValidationError includes invalid indices', () => {
     const err = new BatchValidationError([0, 5]);
+    expect(err).toBeInstanceOf(Error);
+    expect(err).toBeInstanceOf(StellarKitError);
     expect(err.code).toBe('BATCH_VALIDATION_ERROR');
     expect(err.invalidIndices).toEqual([0, 5]);
   });
