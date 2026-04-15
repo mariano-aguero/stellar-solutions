@@ -25,7 +25,7 @@ export async function getHistory(
   return response.records.map((tx) => ({
     hash: tx.hash,
     type: 'transaction',
-    memo: tx.memo ?? undefined,
+    ...(typeof tx.memo === 'string' ? { memo: tx.memo } : {}),
     createdAt: tx.created_at,
     ledger: tx.ledger_attr,
   }));
