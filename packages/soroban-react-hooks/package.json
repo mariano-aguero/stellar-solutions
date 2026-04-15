@@ -1,0 +1,46 @@
+{
+  "name": "@stellar-solutions/soroban-react-hooks",
+  "version": "0.1.0",
+  "description": "React hooks for Soroban smart contracts — wagmi-like DX for Stellar",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/mariano-aguero/stellar-solutions" },
+  "keywords": ["stellar", "soroban", "react", "hooks", "freighter"],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "vitest run --reporter=verbose src/__tests__/integration"
+  },
+  "dependencies": { "@stellar-solutions/core": "workspace:*" },
+  "peerDependencies": {
+    "@stellar/stellar-sdk": ">=12.0.0",
+    "@stellar/freighter-api": ">=3.0.0",
+    "@tanstack/react-query": ">=5.0.0",
+    "react": ">=19.0.0"
+  },
+  "devDependencies": {
+    "@stellar/stellar-sdk": "^13.0.0",
+    "@stellar/freighter-api": "^3.0.0",
+    "@tanstack/react-query": "^5.60.0",
+    "@testing-library/react": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "jsdom": "^25.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "@stellar-solutions/asset-issuer",
+  "version": "0.1.0",
+  "description": "SDK for issuing, minting, and managing custom assets on Stellar",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/mariano-aguero/stellar-solutions" },
+  "keywords": ["stellar", "asset", "token", "issuer"],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "vitest run --reporter=verbose src/__tests__/integration"
+  },
+  "dependencies": { "@stellar-solutions/core": "workspace:*" },
+  "peerDependencies": { "@stellar/stellar-sdk": ">=12.0.0" },
+  "devDependencies": {
+    "@stellar/stellar-sdk": "^13.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}
