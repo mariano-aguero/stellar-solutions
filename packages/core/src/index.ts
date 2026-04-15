@@ -1,2 +1,5 @@
-// placeholder — implemented in subsequent phases
-export const VERSION = '0.1.0';
+export * from './errors.js';
+export * from './network.js';
+export * from './types.js';
+export * from './keypair.js';
+export * from './client.js';
