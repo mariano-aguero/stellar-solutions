@@ -23,6 +23,9 @@ describe('toStroops / fromStroops', () => {
   it('handles fractional amounts', () => {
     expect(toStroops('0.5')).toBe(5_000_000n);
   });
+  it('handles integer and fractional parts together', () => {
+    expect(toStroops('1.25')).toBe(12_500_000n);
+  });
   it('round-trips: toStroops then fromStroops', () => {
     expect(fromStroops(toStroops('2.5'))).toBe('2.5000000');
   });
