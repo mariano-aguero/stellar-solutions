@@ -26,12 +26,11 @@ export function createClient(network: Network, options: ClientOptions = {}): Ste
   const rpc = new RpcModule.Server(networkConfig.sorobanRpcUrl, { allowHttp: false });
 
   function withTimeout<T>(promise: Promise<T>): Promise<T> {
-    return Promise.race([
-      promise,
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new NetworkTimeoutError(timeout)), timeout),
-      ),
-    ]);
+    let timerId: ReturnType<typeof setTimeout>;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timerId = setTimeout(() => reject(new NetworkTimeoutError(timeout)), timeout);
+    });
+    return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timerId));
   }
 
   return { horizon, rpc, networkConfig, withTimeout };

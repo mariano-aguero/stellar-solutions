@@ -23,7 +23,7 @@ describe('createClient', () => {
   it('withTimeout rejects with NetworkTimeoutError on timeout', async () => {
     const client = createClient('testnet', { timeout: 50 });
     const neverResolves = new Promise<never>(() => {});
-    await expect(client.withTimeout(neverResolves)).rejects.toThrow('timed out');
+    await expect(client.withTimeout(neverResolves)).rejects.toThrow('timed out after 50ms');
   });
 
   it('withTimeout rejects with NetworkTimeoutError instance on timeout', async () => {
