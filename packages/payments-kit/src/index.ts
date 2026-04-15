@@ -1,2 +1,4 @@
-// placeholder — implemented in subsequent phases
-export const VERSION = '0.1.0';
+export { StellarKit } from './StellarKit.js';
+export type { StellarKitOptions } from './StellarKit.js';
+export type { PaymentOptions } from './pay.js';
+export type { HistoryOptions } from './history.js';
