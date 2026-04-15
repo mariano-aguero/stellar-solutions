@@ -8,6 +8,6 @@ export default defineConfig({
   clean: true,
   external: ['react', 'react-dom', '@stellar/stellar-sdk', '@stellar/freighter-api', '@tanstack/react-query'],
   esbuildOptions(options) {
-    options.jsx = 'automatic';
+    (options as Record<string, unknown>)['jsx'] = 'automatic';
   },
 });
