@@ -15,6 +15,9 @@ export function publicFromSecret(secretKey: string): string {
 const STROOPS_PER_XLM = 10_000_000n;
 
 export function toStroops(xlm: string): bigint {
+  if (!/^\d+(\.\d+)?$/.test(xlm)) {
+    throw new Error(`toStroops: invalid XLM amount "${xlm}" — must be a non-negative number`);
+  }
   const [whole = '0', fraction = ''] = xlm.split('.');
   const paddedFraction = fraction.padEnd(7, '0').slice(0, 7);
   return BigInt(whole) * STROOPS_PER_XLM + BigInt(paddedFraction);

@@ -29,6 +29,12 @@ describe('toStroops / fromStroops', () => {
   it('round-trips: toStroops then fromStroops', () => {
     expect(fromStroops(toStroops('2.5'))).toBe('2.5000000');
   });
+  it('throws for negative amount', () => {
+    expect(() => toStroops('-1')).toThrow('invalid XLM amount');
+  });
+  it('throws for non-numeric string', () => {
+    expect(() => toStroops('abc')).toThrow('invalid XLM amount');
+  });
 });
 
 describe('publicFromSecret', () => {
