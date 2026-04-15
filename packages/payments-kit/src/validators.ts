@@ -1,4 +1,4 @@
-import { isValidAddress, InvalidAddressError } from '@stellar-solutions/core';
+import { isValidAddress, InvalidAddressError, InvalidAmountError, InvalidAssetCodeError } from '@stellar-solutions/core';
 import type { Asset } from '@stellar-solutions/core';
 
 export function validateAddress(address: string): void {
@@ -10,7 +10,7 @@ export function validateAddress(address: string): void {
 export function validateAmount(amount: string): void {
   const n = Number(amount);
   if (isNaN(n) || n <= 0) {
-    throw new Error(`Invalid amount: "${amount}" — must be a positive number`);
+    throw new InvalidAmountError(amount);
   }
 }
 
@@ -19,7 +19,7 @@ export function validateAsset(asset: Asset): void {
   if (!asset.issuer || !isValidAddress(asset.issuer)) {
     throw new InvalidAddressError(asset.issuer ?? '');
   }
-  if (!asset.code || asset.code.length === 0) {
-    throw new Error('Asset code cannot be empty');
+  if (!asset.code || !/^[A-Z0-9]{1,12}$/.test(asset.code)) {
+    throw new InvalidAssetCodeError(asset.code ?? '');
   }
 }

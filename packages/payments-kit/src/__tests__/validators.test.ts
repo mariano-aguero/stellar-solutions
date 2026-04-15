@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { validateAddress, validateAmount, validateAsset } from '../validators.js';
-import { InvalidAddressError } from '@stellar-solutions/core';
+import { InvalidAddressError, InvalidAmountError, InvalidAssetCodeError } from '@stellar-solutions/core';
 
 describe('validateAddress', () => {
   it('does not throw for valid address', () => {
@@ -16,13 +16,13 @@ describe('validateAmount', () => {
     expect(() => validateAmount('10.5')).not.toThrow();
   });
   it('throws for zero', () => {
-    expect(() => validateAmount('0')).toThrow();
+    expect(() => validateAmount('0')).toThrow(InvalidAmountError);
   });
   it('throws for negative', () => {
-    expect(() => validateAmount('-5')).toThrow();
+    expect(() => validateAmount('-5')).toThrow(InvalidAmountError);
   });
   it('throws for non-numeric string', () => {
-    expect(() => validateAmount('abc')).toThrow();
+    expect(() => validateAmount('abc')).toThrow(InvalidAmountError);
   });
 });
 
@@ -35,5 +35,8 @@ describe('validateAsset', () => {
   });
   it('throws for issued asset with missing issuer', () => {
     expect(() => validateAsset({ code: 'USDC', issuer: '' })).toThrow();
+  });
+  it('throws InvalidAssetCodeError for code that is too long', () => {
+    expect(() => validateAsset({ code: 'TOOLONGCODE123', issuer: 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL' })).toThrow(InvalidAssetCodeError);
   });
 });
