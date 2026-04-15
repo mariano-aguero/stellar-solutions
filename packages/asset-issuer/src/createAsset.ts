@@ -34,14 +34,11 @@ export async function createAsset(
   const txHashes: string[] = [];
 
   // Fund both accounts
-  await fundAccount(client, issuerKeypair.publicKey(), {
-    fundingSecretKey: options.fundingSecretKey,
-    startingBalance: options.startingBalance,
-  });
-  await fundAccount(client, distributorKeypair.publicKey(), {
-    fundingSecretKey: options.fundingSecretKey,
-    startingBalance: options.startingBalance,
-  });
+  const fundingOptions = options.startingBalance !== undefined
+    ? { fundingSecretKey: options.fundingSecretKey, startingBalance: options.startingBalance }
+    : { fundingSecretKey: options.fundingSecretKey };
+  await fundAccount(client, issuerKeypair.publicKey(), fundingOptions);
+  await fundAccount(client, distributorKeypair.publicKey(), fundingOptions);
 
   const asset = new Asset(options.code, issuerKeypair.publicKey());
 
