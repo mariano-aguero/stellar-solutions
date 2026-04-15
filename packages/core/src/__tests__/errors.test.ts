@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   StellarKitError,
   InvalidAddressError,
+  InvalidAmountError,
   InsufficientFundsError,
   NetworkTimeoutError,
   NoTrustlineError,
@@ -53,6 +54,13 @@ describe('typed error subclasses', () => {
 
   it('SequenceError has correct code', () => {
     expect(new SequenceError().code).toBe('SEQUENCE_ERROR');
+  });
+
+  it('InvalidAmountError has correct code', () => {
+    const err = new InvalidAmountError('0');
+    expect(err).toBeInstanceOf(StellarKitError);
+    expect(err.code).toBe('INVALID_AMOUNT');
+    expect(err.message).toContain('"0"');
   });
 
   it('InvalidAssetCodeError has correct code', () => {

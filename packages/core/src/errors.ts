@@ -50,6 +50,16 @@ export class SequenceError extends StellarKitError {
   }
 }
 
+export class InvalidAmountError extends StellarKitError {
+  constructor(amount: string) {
+    super(
+      `Invalid amount: "${amount}" — must be a positive number`,
+      'INVALID_AMOUNT',
+    );
+    this.name = 'InvalidAmountError';
+  }
+}
+
 export class InvalidAssetCodeError extends StellarKitError {
   constructor(code: string) {
     super(
