@@ -18,7 +18,7 @@ npm publication under the `@stellar-solutions/*` scope.
 - **Peer dependencies for externals:** `@stellar/stellar-sdk` is always a peer dependency, never bundled
 - **Dual output:** every package ships both ESM and CJS via tsup; `.d.ts` files always included
 - **Immutable public API:** once a function signature ships in a minor version, it must not change without a major bump (enforced via changesets)
-- **Network isolation in tests:** unit tests never make real HTTP calls; integration tests are opt-in via env var `STELLAR_TEST_SECRET_KEY`
+- **Network isolation in tests:** unit tests never make real HTTP calls (mock Horizon responses); integration tests always run against Stellar testnet (`horizon-testnet.stellar.org`) and require `STELLAR_TEST_SECRET_KEY` — no mainnet in tests, ever
 - **Error typing:** all thrown errors must extend `StellarKitError` from `@stellar-solutions/core`; no raw `Error` throws in public APIs
 
 ---
