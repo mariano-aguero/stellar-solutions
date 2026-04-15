@@ -16,7 +16,7 @@ export const HORIZON_URLS: Record<Network, string> = {
 
 export const SOROBAN_RPC_URLS: Record<Network, string> = {
   testnet: 'https://soroban-testnet.stellar.org',
-  mainnet: 'https://mainnet.stellar.validationcloud.io/v1/XCpFwTmkXhPFzGYDnb32d8x5y2XPf7wC7aFu9T_BWFM',
+  mainnet: 'https://soroban.stellar.org',
 };
 
 const FRIENDBOT_URLS: Record<Network, string | null> = {
