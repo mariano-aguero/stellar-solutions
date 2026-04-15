@@ -1,0 +1,18 @@
+{
+  "name": "example-asset-issuer-node",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Example: create and distribute a custom token with @stellar-solutions/asset-issuer",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@stellar-solutions/asset-issuer": "workspace:*",
+    "@stellar/stellar-sdk": "^13.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
