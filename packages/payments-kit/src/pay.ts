@@ -46,7 +46,7 @@ export async function pay(client: StellarClient, options: PaymentOptions): Promi
   async function buildAndSubmit(retryCount = 0): Promise<TxResult> {
     const account = await client.withTimeout(client.horizon.loadAccount(sourceAddress));
 
-    const builder = new TransactionBuilder(account as Parameters<typeof TransactionBuilder>[0], {
+    const builder = new TransactionBuilder(account as ConstructorParameters<typeof TransactionBuilder>[0], {
       fee: String(fee),
       networkPassphrase: client.networkConfig.networkPassphrase,
     })
@@ -68,17 +68,11 @@ export async function pay(client: StellarClient, options: PaymentOptions): Promi
 
     try {
       const result = await client.withTimeout(client.horizon.submitTransaction(tx));
-      const rawResult = result as {
-        hash: string;
-        ledger: number;
-        fee_charged: string;
-        created_at: string;
-      };
       return {
-        hash: rawResult.hash,
-        ledger: rawResult.ledger,
-        fee: parseInt(rawResult.fee_charged, 10),
-        createdAt: rawResult.created_at,
+        hash: result.hash,
+        ledger: result.ledger,
+        fee,
+        createdAt: new Date().toISOString(),
       };
     } catch (err) {
       if (isBadSeqError(err) && retryCount === 0) {
