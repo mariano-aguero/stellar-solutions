@@ -1,6 +1,12 @@
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@stellar-solutions/core': resolve(__dirname, '../core/dist/index.js'),
+    },
+  },
   test: {
     include: ['src/__tests__/**/*.test.ts'],
     exclude: ['src/__tests__/integration/**'],
