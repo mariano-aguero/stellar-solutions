@@ -1,10 +1,15 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { SorobanProvider } from '@stellar-solutions/soroban-react-hooks';
+import { App } from './App.js';
 
-// Placeholder — implemented in Phase 6
-const root = document.getElementById('root')!;
+const root = document.getElementById('root');
+if (!root) throw new Error('No #root element found');
+
 createRoot(root).render(
   <StrictMode>
-    <div>soroban-react-hooks demo — implemented in Phase 6</div>
+    <SorobanProvider network="testnet">
+      <App />
+    </SorobanProvider>
   </StrictMode>,
 );
