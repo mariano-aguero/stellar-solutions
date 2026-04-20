@@ -8,6 +8,7 @@ import { useWallet } from '../hooks/useWallet.js';
 
 vi.mock('../freighter.js', () => ({
   getFreighterAddress: vi.fn(),
+  getFreighterAddressIfAuthorized: vi.fn().mockResolvedValue(null),
   signWithFreighter: vi.fn(),
 }));
 

@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@stellar/freighter-api', () => ({
   isConnected: vi.fn(),
+  isAllowed: vi.fn(),
+  requestAccess: vi.fn(),
   getNetwork: vi.fn(),
   getAddress: vi.fn(),
   signTransaction: vi.fn(),
@@ -19,6 +21,7 @@ describe('getFreighterAddress', () => {
 
   it('throws NetworkMismatchError when on wrong network', async () => {
     vi.mocked(FreighterAPI.isConnected).mockResolvedValue({ isConnected: true });
+    vi.mocked(FreighterAPI.isAllowed).mockResolvedValue({ isAllowed: true });
     vi.mocked(FreighterAPI.getNetwork).mockResolvedValue({
       network: 'mainnet',
       networkPassphrase: '',
@@ -28,6 +31,7 @@ describe('getFreighterAddress', () => {
 
   it('returns address when connected and on correct network', async () => {
     vi.mocked(FreighterAPI.isConnected).mockResolvedValue({ isConnected: true });
+    vi.mocked(FreighterAPI.isAllowed).mockResolvedValue({ isAllowed: true });
     vi.mocked(FreighterAPI.getNetwork).mockResolvedValue({
       network: 'testnet',
       networkPassphrase: '',
@@ -35,6 +39,20 @@ describe('getFreighterAddress', () => {
     vi.mocked(FreighterAPI.getAddress).mockResolvedValue({ address: 'GABC123', error: '' });
     const address = await getFreighterAddress('testnet');
     expect(address).toBe('GABC123');
+  });
+
+  it('calls requestAccess when origin is not yet authorized', async () => {
+    vi.mocked(FreighterAPI.isConnected).mockResolvedValue({ isConnected: true });
+    vi.mocked(FreighterAPI.isAllowed).mockResolvedValue({ isAllowed: false });
+    vi.mocked(FreighterAPI.requestAccess).mockResolvedValue({ address: 'GABC', error: '' });
+    vi.mocked(FreighterAPI.getNetwork).mockResolvedValue({
+      network: 'testnet',
+      networkPassphrase: '',
+    });
+    vi.mocked(FreighterAPI.getAddress).mockResolvedValue({ address: 'GABC', error: '' });
+    const address = await getFreighterAddress('testnet');
+    expect(FreighterAPI.requestAccess).toHaveBeenCalled();
+    expect(address).toBe('GABC');
   });
 });
 

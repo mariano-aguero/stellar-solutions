@@ -2,6 +2,10 @@
 export { SorobanProvider } from './context/SorobanProvider.js';
 export type { SorobanContextValue } from './context/SorobanContext.js';
 
+// Freighter helpers — consumers building custom mutateFns for useSorobanInvoke
+// need to sign transactions; this is the canonical wrapper.
+export { signWithFreighter } from './freighter.js';
+
 // Hooks
 export { useWallet } from './hooks/useWallet.js';
 export type { WalletState } from './hooks/useWallet.js';

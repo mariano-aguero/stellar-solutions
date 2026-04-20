@@ -20,10 +20,13 @@ export function useSorobanBalance(
 
   return useQuery<string, Error>({
     queryKey: ['soroban', contractId, 'balance', address],
-    enabled: address !== null,
+    // Treat empty string the same as null — wallets briefly surface ''
+    // during unlock/reconnect transitions, and we don't want to fire a
+    // simulation against an empty address.
+    enabled: Boolean(address),
     staleTime: 10_000,
     queryFn: async () => {
-      if (address === null) return '0';
+      if (!address) return '0';
 
       const contract = new Contract(contractId);
       // Simulation-only calls don't require a real sequence number —

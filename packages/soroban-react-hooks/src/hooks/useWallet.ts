@@ -1,9 +1,9 @@
 'use client';
 
 import { StellarKitError } from '@stellar-solutions/core';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSorobanContext } from '../context/SorobanContext.js';
-import { getFreighterAddress } from '../freighter.js';
+import { getFreighterAddress, getFreighterAddressIfAuthorized } from '../freighter.js';
 
 export interface WalletState {
   address: string | null;
@@ -43,9 +43,29 @@ export function useWallet(): WalletState {
     setWalletAddress(null);
   }, [setWalletAddress]);
 
+  // Auto-restore: on mount (and whenever network changes), silently ask Freighter
+  // for the address if the user already authorized this origin. Avoids a connection
+  // loss on page refresh without popping up a fresh auth prompt.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: setWalletAddress is a stable useState setter
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      if (walletAddress !== null) return; // already connected — skip auto-restore
+      const restored = await getFreighterAddressIfAuthorized(network);
+      if (!cancelled && restored !== null) {
+        setWalletAddress(restored);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [network]);
+
   return {
     address: walletAddress,
-    isConnected: walletAddress !== null,
+    // Treat empty string (which Freighter can occasionally return on locked wallets)
+    // the same as null — prevents a "connected but no address" inconsistent UI state.
+    isConnected: Boolean(walletAddress),
     isLoading,
     error,
     connect,
