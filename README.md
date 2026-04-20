@@ -55,6 +55,41 @@ handle.on('payment', (event) => console.log('Payment received:', event.amount));
 handle.on('error', (err) => console.error(err));
 ```
 
+### Issue a custom asset
+
+```typescript
+import { StellarIssuer } from '@stellar-solutions/asset-issuer';
+
+const issuer = new StellarIssuer({
+  network: 'testnet',
+  fundingSecretKey: 'S...',
+});
+
+const asset = await issuer.createAsset({ code: 'MYTKN', totalSupply: '1000000' });
+await issuer.mintTo('G...recipient', '5000');
+
+const holders = await issuer.getHolders();
+```
+
+### Send payments in parallel
+
+```typescript
+import { StellarBatch } from '@stellar-solutions/batch';
+
+const batch = new StellarBatch({
+  secretKey: 'S...',
+  network: 'testnet',
+});
+
+const result = await batch.send([
+  { to: 'G...alice', amount: '10', asset: 'native' },
+  { to: 'G...bob',   amount: '25', asset: 'native' },
+  { to: 'G...carol', amount: '5',  asset: { code: 'USDC', issuer: 'G...' } },
+]);
+
+console.log(`Sent: ${result.successful} / ${result.successful + result.failed}`);
+```
+
 ### React hooks for Soroban
 
 ```tsx
