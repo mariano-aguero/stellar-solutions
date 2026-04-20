@@ -1,0 +1,15 @@
+# Global fallback — all files
+* @mariano-aguero
+
+# Package-level ownership
+/packages/core/                     @mariano-aguero
+/packages/payments-kit/             @mariano-aguero
+/packages/notify/                   @mariano-aguero
+/packages/asset-issuer/             @mariano-aguero
+/packages/batch/                    @mariano-aguero
+/packages/soroban-react-hooks/      @mariano-aguero
+
+# CI/CD and release infrastructure
+/.github/                           @mariano-aguero
+/turbo.json                         @mariano-aguero
+/.changeset/                        @mariano-aguero

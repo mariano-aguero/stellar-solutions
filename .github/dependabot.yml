@@ -1,0 +1,42 @@
+version: 2
+updates:
+  # Root workspace
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Argentina/Buenos_Aires
+    groups:
+      stellar-sdk:
+        patterns:
+          - "@stellar/*"
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+      build-tools:
+        patterns:
+          - "tsup"
+          - "turbo"
+          - "typescript"
+          - "vitest"
+          - "@biomejs/*"
+      changesets:
+        patterns:
+          - "@changesets/*"
+    ignore:
+      # Peer deps — bumped intentionally with major releases
+      - dependency-name: "@stellar/stellar-sdk"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Argentina/Buenos_Aires
