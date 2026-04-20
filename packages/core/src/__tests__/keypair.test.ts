@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { fromStroops, isValidAddress, publicFromSecret, toStroops } from '../keypair.js';
+import {
+  fromStroops,
+  isValidAddress,
+  isValidAmount,
+  publicFromSecret,
+  toStroops,
+} from '../keypair.js';
 
 describe('isValidAddress', () => {
   it('returns true for valid G... address', () => {
@@ -37,6 +43,51 @@ describe('toStroops / fromStroops', () => {
   });
   it('throws InvalidAmountError for negative fromStroops', () => {
     expect(() => fromStroops(-1n)).toThrow('Invalid amount');
+  });
+
+  // Edge cases added after hardening — these are the specific regressions that the
+  // tightened canonical regex was meant to prevent.
+  it('accepts the minimum non-zero amount (1 stroop)', () => {
+    expect(toStroops('0.0000001')).toBe(1n);
+  });
+  it('rejects amounts with more than 7 decimal places (no silent truncation)', () => {
+    expect(() => toStroops('1.12345678')).toThrow('Invalid amount');
+    expect(() => toStroops('10.00000001')).toThrow('Invalid amount');
+  });
+  it('rejects leading zeros', () => {
+    expect(() => toStroops('007.5')).toThrow('Invalid amount');
+    expect(() => toStroops('01')).toThrow('Invalid amount');
+  });
+  it('accepts "0" exactly (but produces 0n)', () => {
+    expect(toStroops('0')).toBe(0n);
+    expect(toStroops('0.0')).toBe(0n);
+  });
+  it('rejects empty strings and whitespace', () => {
+    expect(() => toStroops('')).toThrow('Invalid amount');
+    expect(() => toStroops(' 1')).toThrow('Invalid amount');
+    expect(() => toStroops('1 ')).toThrow('Invalid amount');
+  });
+  it('handles very large integer amounts without precision loss', () => {
+    // ~900 million XLM — well above anything float64 could represent safely.
+    expect(toStroops('900000000')).toBe(9_000_000_000_000_000n);
+  });
+});
+
+describe('isValidAmount', () => {
+  it.each([
+    ['1', true],
+    ['0', true],
+    ['0.0000001', true],
+    ['10.5000000', true],
+    ['007.5', false],
+    ['01', false],
+    ['1.12345678', false],
+    ['-1', false],
+    ['abc', false],
+    ['', false],
+    [' 1', false],
+  ])('isValidAmount(%j) === %j', (input, expected) => {
+    expect(isValidAmount(input)).toBe(expected);
   });
 });
 
