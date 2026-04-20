@@ -11,7 +11,7 @@ const issuer = new StellarIssuer({ network: 'testnet', fundingSecretKey: SECRET 
 
 console.log('Creating asset DEMOTKN on testnet...');
 
-const asset = await issuer.createAsset({ code: 'DEMOTKN', totalSupply: 10_000 });
+const asset = await issuer.createAsset({ code: 'DEMOTKN', totalSupply: '10000' });
 
 console.log(`\nAsset created!`);
 console.log(`  Issuer:      ${asset.issuerAddress}`);

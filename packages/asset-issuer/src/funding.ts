@@ -1,5 +1,6 @@
 import { Keypair, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { StellarClient } from '@stellar-solutions/core';
+import { FundingError } from '@stellar-solutions/core';
 
 export interface FundingOptions {
   fundingSecretKey: string;
@@ -20,7 +21,7 @@ export async function fundAccount(
     );
     if (!response.ok) {
       const body = await response.text();
-      throw new Error(`Friendbot failed (${response.status}): ${body}`);
+      throw new FundingError(`Friendbot failed (${response.status}): ${body}`, { status: response.status });
     }
     return;
   }

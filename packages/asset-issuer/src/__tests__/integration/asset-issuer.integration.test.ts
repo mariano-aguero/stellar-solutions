@@ -10,7 +10,7 @@ describe.skipIf(!SECRET)('asset-issuer integration (testnet)', () => {
       fundingSecretKey: SECRET!,
     });
 
-    const asset = await issuer.createAsset({ code: 'TSTKN', totalSupply: 1000 });
+    const asset = await issuer.createAsset({ code: 'TSTKN', totalSupply: '1000' });
     expect(asset.explorerUrl).toContain('stellar.expert');
     expect(asset.txHashes.length).toBeGreaterThanOrEqual(2);
 

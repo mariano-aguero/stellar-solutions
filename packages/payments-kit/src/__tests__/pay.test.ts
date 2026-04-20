@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { Keypair } from '@stellar/stellar-sdk';
 import { pay } from '../pay.js';
 import type { StellarClient } from '@stellar-solutions/core';
-import { SequenceError } from '@stellar-solutions/core';
+import { SequenceError, InvalidSecretKeyError } from '@stellar-solutions/core';
 
 // Known-valid Stellar keypair for testing
 const TEST_SECRET = 'SCN6I4YH2IR7SZ6RHYQMI2TCTS4VXG6MGS4APWXYEUH26VFMYPQMUT5A';
@@ -39,6 +39,18 @@ function makeMockClient(overrides?: Partial<{ submitResult: unknown; loadAccount
   } as unknown as StellarClient;
 }
 
+describe('pay — validation', () => {
+  it('throws InvalidSecretKeyError for invalid secret key', async () => {
+    const client = makeMockClient();
+    await expect(pay(client, {
+      from: 'NOTASECRETKEY',
+      to: TEST_DEST,
+      amount: '1',
+      asset: 'native',
+    })).rejects.toThrow(InvalidSecretKeyError);
+  });
+});
+
 describe('pay — happy path', () => {
   it('submits XLM payment and returns TxResult', async () => {
     const client = makeMockClient();
@@ -50,8 +62,7 @@ describe('pay — happy path', () => {
     });
     expect(result.hash).toBe(mockSubmitResult.hash);
     expect(result.ledger).toBe(12345);
-    // estimateFee applies 1.5x multiplier to p50=100, so fee = ceil(100 * 1.5) = 150
-    expect(result.fee).toBe(150);
+    expect(result.fee).toBe('100'); // fee_charged from Horizon response (stroops, string)
   });
 
   it('uses provided fee instead of estimating', async () => {
@@ -71,7 +82,7 @@ describe('pay — happy path', () => {
       to: TEST_DEST,
       amount: '5',
       asset: 'native',
-      fee: 200,
+      fee: '200',
     });
     expect(result.hash).toBe(mockSubmitResult.hash);
     // feeStats should NOT be called since fee was provided

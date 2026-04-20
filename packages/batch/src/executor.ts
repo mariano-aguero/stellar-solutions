@@ -5,6 +5,8 @@ import type { ResultCollector } from './result-collector.js';
 export interface ExecuteOptions {
   onProgress?: (done: number, total: number) => void;
   maxRetries?: number;
+  /** Absolute offset of the first chunk in the original payment array (for failure indexing). */
+  startOffset?: number;
 }
 
 export async function executeChunks(
@@ -17,9 +19,11 @@ export async function executeChunks(
   const maxRetries = options.maxRetries ?? 3;
   const total = chunks.reduce((sum, c) => sum + c.length, 0);
   let processed = 0;
+  let offset = options.startOffset ?? 0;
 
-  for (const [i, chunk] of chunks.entries()) {
-    await submitChunkWithRetry(client, keypair, chunk, i * 100, collector, maxRetries);
+  for (const chunk of chunks) {
+    await submitChunkWithRetry(client, keypair, chunk, offset, collector, maxRetries);
+    offset += chunk.length;
     processed += chunk.length;
     options.onProgress?.(processed, total);
   }
@@ -33,6 +37,7 @@ async function submitChunkWithRetry(
   collector: ResultCollector,
   maxRetries: number,
   attempt = 0,
+  badSeqRetries = 0,
 ): Promise<void> {
   try {
     const account = await client.withTimeout(client.horizon.loadAccount(keypair.publicKey()));
@@ -55,26 +60,34 @@ async function submitChunkWithRetry(
     const result = await client.withTimeout(client.horizon.submitTransaction(tx));
     collector.recordSuccess(result.hash, chunk.length);
   } catch (err: unknown) {
-    if (isBadSeqError(err) && attempt === 0) {
-      return submitChunkWithRetry(client, keypair, chunk, startIndex, collector, maxRetries, 1);
+    // bad_seq is retried at most once regardless of attempt number — sequence skew can happen any time.
+    if (isBadSeqError(err) && badSeqRetries === 0) {
+      return submitChunkWithRetry(client, keypair, chunk, startIndex, collector, maxRetries, attempt, 1);
     }
     if (isRetryableError(err) && attempt < maxRetries) {
-      return submitChunkWithRetry(client, keypair, chunk, startIndex, collector, maxRetries, attempt + 1);
+      return submitChunkWithRetry(client, keypair, chunk, startIndex, collector, maxRetries, attempt + 1, badSeqRetries);
     }
     const reason = err instanceof Error ? err.message : String(err);
-    const code = extractCode(err);
+    const code = extractTxResultCode(err);
     collector.recordFailure(chunk, startIndex, reason, code);
   }
 }
 
+function getTxResultCodes(err: unknown): Record<string, unknown> | undefined {
+  if (err == null || typeof err !== 'object') return undefined;
+  const response = (err as { response?: unknown }).response;
+  if (response == null || typeof response !== 'object') return undefined;
+  const data = (response as { data?: unknown }).data;
+  if (data == null || typeof data !== 'object') return undefined;
+  const extras = (data as { extras?: unknown }).extras;
+  if (extras == null || typeof extras !== 'object') return undefined;
+  const codes = (extras as { result_codes?: unknown }).result_codes;
+  if (codes == null || typeof codes !== 'object') return undefined;
+  return codes as Record<string, unknown>;
+}
+
 function isBadSeqError(err: unknown): boolean {
-  if (err == null || typeof err !== 'object') return false;
-  const e = err as Record<string, unknown>;
-  const data = (e['response'] as Record<string, unknown> | undefined)?.['data'] as Record<string, unknown> | undefined;
-  return (data?.['extras'] as Record<string, unknown> | undefined)
-    ?.['result_codes'] != null &&
-    ((data?.['extras'] as Record<string, unknown>)['result_codes'] as Record<string, unknown>)
-    ?.['transaction'] === 'tx_bad_seq';
+  return getTxResultCodes(err)?.['transaction'] === 'tx_bad_seq';
 }
 
 function isRetryableError(err: unknown): boolean {
@@ -83,11 +96,7 @@ function isRetryableError(err: unknown): boolean {
   return msg.includes('timeout') || msg.includes('tx_too_late') || msg.includes('NetworkTimeoutError');
 }
 
-function extractCode(err: unknown): string | undefined {
-  if (err == null || typeof err !== 'object') return undefined;
-  const e = err as Record<string, unknown>;
-  const data = (e['response'] as Record<string, unknown> | undefined)?.['data'] as Record<string, unknown> | undefined;
-  const codes = (data?.['extras'] as Record<string, unknown> | undefined)?.['result_codes'] as Record<string, unknown> | undefined;
-  const code = codes?.['transaction'];
+function extractTxResultCode(err: unknown): string | undefined {
+  const code = getTxResultCodes(err)?.['transaction'];
   return typeof code === 'string' ? code : undefined;
 }

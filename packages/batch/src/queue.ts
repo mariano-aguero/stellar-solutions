@@ -1,11 +1,12 @@
-import { EmptyBatchError, BatchValidationError, isValidAddress } from '@stellar-solutions/core';
+import { EmptyBatchError, BatchValidationError, isValidAddress, toStroops } from '@stellar-solutions/core';
 import type { BatchPayment } from '@stellar-solutions/core';
 
-const AMOUNT_REGEX = /^\d+(\.\d{1,7})?$/;
-
-function isValidAmount(amount: string): boolean {
-  if (!AMOUNT_REGEX.test(amount)) return false;
-  return parseFloat(amount) > 0;
+function isValidPositiveAmount(amount: string): boolean {
+  try {
+    return toStroops(amount) > 0n;
+  } catch {
+    return false;
+  }
 }
 
 export function validateAndChunk(payments: BatchPayment[]): BatchPayment[][] {
@@ -14,7 +15,7 @@ export function validateAndChunk(payments: BatchPayment[]): BatchPayment[][] {
   const invalid: number[] = [];
   payments.forEach((p, i) => {
     if (!isValidAddress(p.to)) invalid.push(i);
-    else if (!isValidAmount(p.amount)) invalid.push(i);
+    else if (!isValidPositiveAmount(p.amount)) invalid.push(i);
   });
   if (invalid.length > 0) throw new BatchValidationError(invalid);
 

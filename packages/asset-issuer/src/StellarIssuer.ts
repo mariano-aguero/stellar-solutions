@@ -1,4 +1,4 @@
-import { createClient } from '@stellar-solutions/core';
+import { createClient, NoAssetCreatedError } from '@stellar-solutions/core';
 import type { StellarClient, TxResult, Network } from '@stellar-solutions/core';
 import { createAsset } from './createAsset.js';
 import { mintTo } from './mint.js';
@@ -31,7 +31,7 @@ export class StellarIssuer {
   }
 
   async mintTo(destination: string, amount: string): Promise<TxResult> {
-    if (!this.lastAsset) throw new Error('No asset created yet. Call createAsset() first.');
+    if (!this.lastAsset) throw new NoAssetCreatedError();
     return mintTo(this.client, {
       issuerSecretKey: this.lastAsset.issuerSecretKey,
       assetCode: this.lastAsset.assetCode,
@@ -41,7 +41,7 @@ export class StellarIssuer {
   }
 
   async burn(amount: string): Promise<TxResult> {
-    if (!this.lastAsset) throw new Error('No asset created yet. Call createAsset() first.');
+    if (!this.lastAsset) throw new NoAssetCreatedError();
     return burn(this.client, {
       distributorSecretKey: this.lastAsset.distributorSecretKey,
       issuerAddress: this.lastAsset.issuerAddress,
@@ -51,7 +51,7 @@ export class StellarIssuer {
   }
 
   async getHolders(): Promise<Holder[]> {
-    if (!this.lastAsset) throw new Error('No asset created yet. Call createAsset() first.');
+    if (!this.lastAsset) throw new NoAssetCreatedError();
     return getHolders(this.client, {
       assetCode: this.lastAsset.assetCode,
       issuerAddress: this.lastAsset.issuerAddress,

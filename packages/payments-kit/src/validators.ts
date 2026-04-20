@@ -1,4 +1,4 @@
-import { isValidAddress, InvalidAddressError, InvalidAmountError, InvalidAssetCodeError } from '@stellar-solutions/core';
+import { isValidAddress, InvalidAddressError, InvalidAmountError, InvalidAssetCodeError, toStroops } from '@stellar-solutions/core';
 import type { Asset } from '@stellar-solutions/core';
 
 export function validateAddress(address: string): void {
@@ -8,8 +8,15 @@ export function validateAddress(address: string): void {
 }
 
 export function validateAmount(amount: string): void {
-  const n = Number(amount);
-  if (isNaN(n) || n <= 0) {
+  // toStroops enforces canonical Stellar format (no leading zeros, ≤7 decimals)
+  // and returns a bigint, so we can compare positivity without float loss.
+  let stroops: bigint;
+  try {
+    stroops = toStroops(amount);
+  } catch {
+    throw new InvalidAmountError(amount);
+  }
+  if (stroops <= 0n) {
     throw new InvalidAmountError(amount);
   }
 }

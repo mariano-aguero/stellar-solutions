@@ -1,10 +1,14 @@
 import type { StellarClient, Asset } from '@stellar-solutions/core';
+import { isValidAddress, InvalidAddressError } from '@stellar-solutions/core';
 
 export async function getBalance(
   client: StellarClient,
   address: string,
   asset?: Asset,
 ): Promise<string> {
+  if (!isValidAddress(address)) {
+    throw new InvalidAddressError(address);
+  }
   const account = await client.withTimeout(client.horizon.loadAccount(address));
 
   if (!asset || asset === 'native') {

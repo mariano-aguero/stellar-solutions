@@ -1,5 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { StellarIssuer } from '../StellarIssuer.js';
+import { NoAssetCreatedError } from '@stellar-solutions/core';
 import type { AssetResult } from '../createAsset.js';
 import type { TxResult } from '@stellar-solutions/core';
 import type { Holder } from '../holders.js';
@@ -32,7 +33,7 @@ const MOCK_ASSET_RESULT: AssetResult = {
 const MOCK_TX_RESULT: TxResult = {
   hash: 'txhash1',
   ledger: 100,
-  fee: 100,
+  fee: '100',
   createdAt: '2026-04-15T00:00:00.000Z',
 };
 
@@ -54,14 +55,14 @@ describe('StellarIssuer', () => {
   it('createAsset() calls underlying createAsset with merged fundingSecretKey', async () => {
     vi.mocked(mockCreateAsset).mockResolvedValueOnce(MOCK_ASSET_RESULT);
 
-    const result = await issuer.createAsset({ code: 'MYTKN', totalSupply: 1_000_000 });
+    const result = await issuer.createAsset({ code: 'MYTKN', totalSupply: '1000000' });
 
     expect(mockCreateAsset).toHaveBeenCalledOnce();
     expect(mockCreateAsset).toHaveBeenCalledWith(
       {},
       {
         code: 'MYTKN',
-        totalSupply: 1_000_000,
+        totalSupply: '1000000',
         fundingSecretKey: 'SFUNDING123',
       },
     );
@@ -72,7 +73,7 @@ describe('StellarIssuer', () => {
     vi.mocked(mockCreateAsset).mockResolvedValueOnce(MOCK_ASSET_RESULT);
     vi.mocked(mockMintTo).mockResolvedValueOnce(MOCK_TX_RESULT);
 
-    await issuer.createAsset({ code: 'MYTKN', totalSupply: 1_000_000 });
+    await issuer.createAsset({ code: 'MYTKN', totalSupply: '1000000' });
     const result = await issuer.mintTo('GDEST999', '500');
 
     expect(mockMintTo).toHaveBeenCalledOnce();
@@ -92,7 +93,7 @@ describe('StellarIssuer', () => {
     vi.mocked(mockCreateAsset).mockResolvedValueOnce(MOCK_ASSET_RESULT);
     vi.mocked(mockBurn).mockResolvedValueOnce(MOCK_TX_RESULT);
 
-    await issuer.createAsset({ code: 'MYTKN', totalSupply: 1_000_000 });
+    await issuer.createAsset({ code: 'MYTKN', totalSupply: '1000000' });
     const result = await issuer.burn('200');
 
     expect(mockBurn).toHaveBeenCalledOnce();
@@ -112,7 +113,7 @@ describe('StellarIssuer', () => {
     vi.mocked(mockCreateAsset).mockResolvedValueOnce(MOCK_ASSET_RESULT);
     vi.mocked(mockGetHolders).mockResolvedValueOnce(MOCK_HOLDERS);
 
-    await issuer.createAsset({ code: 'MYTKN', totalSupply: 1_000_000 });
+    await issuer.createAsset({ code: 'MYTKN', totalSupply: '1000000' });
     const result = await issuer.getHolders();
 
     expect(mockGetHolders).toHaveBeenCalledOnce();
@@ -126,24 +127,18 @@ describe('StellarIssuer', () => {
     expect(result).toEqual(MOCK_HOLDERS);
   });
 
-  it('mintTo() throws if no asset has been created yet', async () => {
-    await expect(issuer.mintTo('GDEST999', '500')).rejects.toThrow(
-      'No asset created yet. Call createAsset() first.',
-    );
+  it('mintTo() throws NoAssetCreatedError if no asset has been created yet', async () => {
+    await expect(issuer.mintTo('GDEST999', '500')).rejects.toThrow(NoAssetCreatedError);
     expect(mockMintTo).not.toHaveBeenCalled();
   });
 
-  it('burn() throws if no asset has been created yet', async () => {
-    await expect(issuer.burn('200')).rejects.toThrow(
-      'No asset created yet. Call createAsset() first.',
-    );
+  it('burn() throws NoAssetCreatedError if no asset has been created yet', async () => {
+    await expect(issuer.burn('200')).rejects.toThrow(NoAssetCreatedError);
     expect(mockBurn).not.toHaveBeenCalled();
   });
 
-  it('getHolders() throws if no asset has been created yet', async () => {
-    await expect(issuer.getHolders()).rejects.toThrow(
-      'No asset created yet. Call createAsset() first.',
-    );
+  it('getHolders() throws NoAssetCreatedError if no asset has been created yet', async () => {
+    await expect(issuer.getHolders()).rejects.toThrow(NoAssetCreatedError);
     expect(mockGetHolders).not.toHaveBeenCalled();
   });
 });

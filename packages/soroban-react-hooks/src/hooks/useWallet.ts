@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { StellarKitError, FreighterNotInstalledError } from '@stellar-solutions/core';
+'use client';
+
+import { useCallback, useState } from 'react';
+import { StellarKitError } from '@stellar-solutions/core';
 import { useSorobanContext } from '../context/SorobanContext.js';
 import { getFreighterAddress } from '../freighter.js';
 
@@ -17,7 +19,10 @@ export function useWallet(): WalletState {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<StellarKitError | null>(null);
 
-  const connect = async (): Promise<void> => {
+  // useCallback with [network] — if network changes, consumers that captured connect
+  // via deps (e.g. useEffect(() => { connect() }, [connect])) will get the updated ref
+  // and authenticate against the current network.
+  const connect = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     setError(null);
     try {
@@ -32,11 +37,11 @@ export function useWallet(): WalletState {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [network, setWalletAddress]);
 
-  const disconnect = (): void => {
+  const disconnect = useCallback((): void => {
     setWalletAddress(null);
-  };
+  }, [setWalletAddress]);
 
   return {
     address: walletAddress,

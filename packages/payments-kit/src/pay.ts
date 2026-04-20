@@ -3,20 +3,27 @@ import {
   Keypair,
   Memo,
   Operation,
+  StrKey,
   TransactionBuilder,
 } from '@stellar/stellar-sdk';
 import type { StellarClient, TxResult, Asset } from '@stellar-solutions/core';
-import { SequenceError } from '@stellar-solutions/core';
+import { SequenceError, InvalidSecretKeyError } from '@stellar-solutions/core';
 import { estimateFee } from './fees.js';
 import { validateAddress, validateAmount, validateAsset } from './validators.js';
 
 export interface PaymentOptions {
-  from: string;     // secret key
-  to: string;       // public key destination
+  /**
+   * SECRET key of the source account. **Never** log, serialize, or transmit this value.
+   * Exists only in memory for signing and should be discarded after the call.
+   */
+  from: string;
+  /** Public key (G...) of the destination account. */
+  to: string;
   amount: string;
   asset: Asset;
   memo?: string;
-  fee?: number;
+  /** Fee in stroops as a decimal string (e.g. "100"). If omitted, fetched from Horizon feeStats. */
+  fee?: string;
 }
 
 function toStellarAsset(asset: Asset): StellarAsset {
@@ -24,16 +31,30 @@ function toStellarAsset(asset: Asset): StellarAsset {
   return new StellarAsset(asset.code, asset.issuer);
 }
 
-function isBadSeqError(err: unknown): boolean {
-  try {
-    const e = err as { response?: { data?: { extras?: { result_codes?: { transaction?: string } } } } };
-    return e.response?.data?.extras?.result_codes?.transaction === 'tx_bad_seq';
-  } catch {
-    return false;
+function extractFeeCharged(result: unknown, fallback: string): string {
+  if (result != null && typeof result === 'object' && 'fee_charged' in result) {
+    const fc = (result as { fee_charged: unknown }).fee_charged;
+    if (typeof fc === 'string' && /^\d+$/.test(fc)) return fc;
+    if (typeof fc === 'number' && Number.isFinite(fc)) return String(fc);
   }
+  return fallback;
+}
+
+function isBadSeqError(err: unknown): boolean {
+  if (err == null || typeof err !== 'object') return false;
+  const response = (err as Record<string, unknown>).response;
+  if (response == null || typeof response !== 'object') return false;
+  const data = (response as Record<string, unknown>).data;
+  if (data == null || typeof data !== 'object') return false;
+  const extras = (data as Record<string, unknown>).extras;
+  if (extras == null || typeof extras !== 'object') return false;
+  const resultCodes = (extras as Record<string, unknown>).result_codes;
+  if (resultCodes == null || typeof resultCodes !== 'object') return false;
+  return (resultCodes as Record<string, unknown>).transaction === 'tx_bad_seq';
 }
 
 export async function pay(client: StellarClient, options: PaymentOptions): Promise<TxResult> {
+  if (!StrKey.isValidEd25519SecretSeed(options.from)) throw new InvalidSecretKeyError();
   const keypair = Keypair.fromSecret(options.from);
   const sourceAddress = keypair.publicKey();
 
@@ -47,7 +68,7 @@ export async function pay(client: StellarClient, options: PaymentOptions): Promi
     const account = await client.withTimeout(client.horizon.loadAccount(sourceAddress));
 
     const builder = new TransactionBuilder(account as ConstructorParameters<typeof TransactionBuilder>[0], {
-      fee: String(fee),
+      fee,
       networkPassphrase: client.networkConfig.networkPassphrase,
     })
       .addOperation(
@@ -71,7 +92,7 @@ export async function pay(client: StellarClient, options: PaymentOptions): Promi
       return {
         hash: result.hash,
         ledger: result.ledger,
-        fee,
+        fee: extractFeeCharged(result, String(fee)),
         createdAt: new Date().toISOString(),
       };
     } catch (err) {

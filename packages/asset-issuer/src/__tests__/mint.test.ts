@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { StellarClient } from '@stellar-solutions/core';
-import { IssuerLockedError } from '@stellar-solutions/core';
+import { IssuerLockedError, InvalidSecretKeyError, InvalidAssetCodeError, InvalidAddressError, InvalidAmountError } from '@stellar-solutions/core';
 import { mintTo } from '../mint.js';
 
 const ISSUER_SECRET = 'SCN6I4YH2IR7SZ6RHYQMI2TCTS4VXG6MGS4APWXYEUH26VFMYPQMUT5A';
@@ -20,11 +20,51 @@ function makeMintClient(masterWeight = 1) {
         thresholds: { low_threshold: 0, med_threshold: 0, high_threshold: 0 },
         incrementSequenceNumber: vi.fn(),
       }),
-      submitTransaction: vi.fn().mockResolvedValue({ hash: 'mint-tx', ledger: 1 }),
+      submitTransaction: vi.fn().mockResolvedValue({ hash: 'mint-tx', ledger: 1, fee_charged: '100' }),
     },
     withTimeout: (p: Promise<unknown>) => p,
   } as unknown as StellarClient;
 }
+
+const STUB_CLIENT = {} as unknown as StellarClient;
+
+describe('mintTo — validation', () => {
+  it('throws InvalidSecretKeyError for invalid secret key', async () => {
+    await expect(mintTo(STUB_CLIENT, {
+      issuerSecretKey: 'BADSECRET',
+      assetCode: 'TSTKN',
+      destination: ISSUER_PUBLIC,
+      amount: '100',
+    })).rejects.toThrow(InvalidSecretKeyError);
+  });
+
+  it('throws InvalidAddressError for invalid destination', async () => {
+    await expect(mintTo(STUB_CLIENT, {
+      issuerSecretKey: ISSUER_SECRET,
+      assetCode: 'TSTKN',
+      destination: 'BADINVALID',
+      amount: '100',
+    })).rejects.toThrow(InvalidAddressError);
+  });
+
+  it('throws InvalidAmountError for zero amount', async () => {
+    await expect(mintTo(STUB_CLIENT, {
+      issuerSecretKey: ISSUER_SECRET,
+      assetCode: 'TSTKN',
+      destination: ISSUER_PUBLIC,
+      amount: '0',
+    })).rejects.toThrow(InvalidAmountError);
+  });
+
+  it('throws InvalidAssetCodeError for invalid asset code', async () => {
+    await expect(mintTo(STUB_CLIENT, {
+      issuerSecretKey: ISSUER_SECRET,
+      assetCode: 'invalid!',
+      destination: ISSUER_PUBLIC,
+      amount: '100',
+    })).rejects.toThrow(InvalidAssetCodeError);
+  });
+});
 
 describe('mintTo', () => {
   it('submits payment from issuer to destination', async () => {

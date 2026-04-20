@@ -5,7 +5,8 @@ export type Asset =
 export interface TxResult {
   hash: string;
   ledger: number;
-  fee: number;
+  /** Fee actually charged, in stroops. String (not number) to stay consistent with amount fields. */
+  fee: string;
   createdAt: string;
 }
 
@@ -18,7 +19,8 @@ export interface HistoryEntry {
   to?: string;
   memo?: string;
   createdAt: string;
-  ledger: number;
+  /** Ledger sequence — omitted when the source endpoint (e.g. `/payments`) doesn't expose it. */
+  ledger?: number;
 }
 
 export interface Holder {

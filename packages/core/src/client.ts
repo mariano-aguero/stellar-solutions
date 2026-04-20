@@ -13,6 +13,8 @@ export interface ClientOptions {
   horizonUrl?: string;
   sorobanRpcUrl?: string;
   timeout?: number;
+  /** Allow http:// URLs (defaults to true only if the URL is actually http — for local dev). */
+  allowHttp?: boolean;
 }
 
 export function createClient(network: Network, options: ClientOptions = {}): StellarClient {
@@ -22,8 +24,10 @@ export function createClient(network: Network, options: ClientOptions = {}): Ste
   if (options.sorobanRpcUrl !== undefined) overrides.sorobanRpcUrl = options.sorobanRpcUrl;
   const networkConfig = getNetworkConfig(network, overrides);
 
-  const horizon = new Horizon.Server(networkConfig.horizonUrl, { allowHttp: false });
-  const rpc = new RpcModule.Server(networkConfig.sorobanRpcUrl, { allowHttp: false });
+  const horizonHttp = options.allowHttp ?? networkConfig.horizonUrl.startsWith('http://');
+  const rpcHttp = options.allowHttp ?? networkConfig.sorobanRpcUrl.startsWith('http://');
+  const horizon = new Horizon.Server(networkConfig.horizonUrl, { allowHttp: horizonHttp });
+  const rpc = new RpcModule.Server(networkConfig.sorobanRpcUrl, { allowHttp: rpcHttp });
 
   function withTimeout<T>(promise: Promise<T>): Promise<T> {
     let timerId: ReturnType<typeof setTimeout>;

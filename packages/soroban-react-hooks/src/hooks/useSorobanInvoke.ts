@@ -1,46 +1,56 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { StellarKitError, TxResult } from '@stellar-solutions/core';
+import { StellarKitError } from '@stellar-solutions/core';
+import type { TxResult } from '@stellar-solutions/core';
 import { useSorobanContext } from '../context/SorobanContext.js';
 import type { rpc } from '@stellar/stellar-sdk';
 
-export interface UseSorobanInvokeOptions {
-  mutateFn?: (rpc: rpc.Server, args: unknown[]) => Promise<TxResult>;
+export interface UseSorobanInvokeOptions<TArgs extends readonly unknown[] = readonly unknown[]> {
+  mutateFn?: (rpc: rpc.Server, args: TArgs) => Promise<TxResult>;
 }
 
-export interface SorobanInvokeResult {
-  invoke: (args: unknown[]) => Promise<TxResult>;
+export interface SorobanInvokeResult<TArgs extends readonly unknown[] = readonly unknown[]> {
+  invoke: (args: TArgs) => Promise<TxResult>;
   isPending: boolean;
   error: StellarKitError | null;
   data: TxResult | undefined;
 }
 
-export function useSorobanInvoke(
+export function useSorobanInvoke<TArgs extends readonly unknown[] = readonly unknown[]>(
   contractId: string,
   methodName: string,
-  options: UseSorobanInvokeOptions = {},
-): SorobanInvokeResult {
+  options: UseSorobanInvokeOptions<TArgs> = {},
+): SorobanInvokeResult<TArgs> {
   const { client } = useSorobanContext();
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<TxResult, Error, unknown[]>({
-    mutationFn: async (args: unknown[]) => {
+  const mutation = useMutation<TxResult, Error, TArgs>({
+    mutationFn: async (args: TArgs) => {
       if (options.mutateFn !== undefined) {
         return options.mutateFn(client.rpc, args);
       }
-      // Default: simulate → sign → submit
-      // This requires building a transaction, which needs the user's address
-      // In practice callers provide mutateFn for full control
-      throw new Error(`No mutateFn provided for ${contractId}.${methodName}`);
+      throw new StellarKitError(
+        `No mutateFn provided for ${contractId}.${methodName}`,
+        'NO_MUTATE_FN',
+      );
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['soroban', contractId] });
     },
   });
 
+  // Normalize all errors to StellarKitError so consumers always deal with a consistent type.
+  const error = mutation.error instanceof StellarKitError
+    ? mutation.error
+    : mutation.error !== null
+    ? new StellarKitError(mutation.error.message, 'UNKNOWN')
+    : null;
+
   return {
     invoke: mutation.mutateAsync,
     isPending: mutation.isPending,
-    error: mutation.error instanceof Error ? (mutation.error as StellarKitError) : null,
+    error,
     data: mutation.data,
   };
 }

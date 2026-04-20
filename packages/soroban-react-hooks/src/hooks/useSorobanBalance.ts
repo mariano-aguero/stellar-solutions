@@ -1,17 +1,44 @@
-import type { UseQueryResult } from '@tanstack/react-query';
-import { useSorobanQuery } from './useSorobanQuery.js';
+'use client';
+
+import { Contract, Address, Account, TransactionBuilder, rpc as RpcModule, scValToNative } from '@stellar/stellar-sdk';
+import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { StellarKitError } from '@stellar-solutions/core';
+import { useSorobanContext } from '../context/SorobanContext.js';
 
 export function useSorobanBalance(
   contractId: string,
   address: string | null,
 ): UseQueryResult<string, Error> {
-  return useSorobanQuery<string>(contractId, 'balance', {
+  const { client } = useSorobanContext();
+
+  return useQuery<string, Error>({
+    queryKey: ['soroban', contractId, 'balance', address],
     enabled: address !== null,
-    queryFn: async (rpc) => {
-      // In a real implementation: call balance(address) on the SAC contract
-      // For now, this is a placeholder that consumers can override via queryFn
-      void rpc;
-      return '0';
+    staleTime: 10_000,
+    queryFn: async () => {
+      if (address === null) return '0';
+
+      const contract = new Contract(contractId);
+      // Simulation-only calls don't require a real sequence number —
+      // use the queried address as the fake source account.
+      const fakeAccount = new Account(address, '0');
+      const tx = new TransactionBuilder(fakeAccount, {
+        fee: '100',
+        networkPassphrase: client.networkConfig.networkPassphrase,
+      })
+        .addOperation(contract.call('balance', Address.fromString(address).toScVal()))
+        .setTimeout(30)
+        .build();
+
+      const sim = await client.rpc.simulateTransaction(tx);
+      if (RpcModule.Api.isSimulationError(sim)) {
+        throw new StellarKitError(sim.error, 'SOROBAN_SIMULATION_ERROR');
+      }
+      if (!('result' in sim) || sim.result === undefined) {
+        return '0';
+      }
+      const native = scValToNative(sim.result.retval);
+      return String(native);
     },
   });
 }

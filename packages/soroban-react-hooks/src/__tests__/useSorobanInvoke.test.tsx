@@ -23,7 +23,7 @@ vi.mock('@stellar-solutions/core', async (importOriginal) => {
   };
 });
 
-const mockTxResult = { hash: 'abc123', ledger: 1, fee: 100, createdAt: '2024-01-01T00:00:00Z' };
+const mockTxResult = { hash: 'abc123', ledger: 1, fee: '100', createdAt: '2024-01-01T00:00:00Z' };
 
 function makeWrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });

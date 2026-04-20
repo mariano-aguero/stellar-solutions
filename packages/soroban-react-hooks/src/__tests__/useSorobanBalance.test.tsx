@@ -5,15 +5,42 @@ import { QueryClient } from '@tanstack/react-query';
 import { SorobanProvider } from '../context/SorobanProvider.js';
 import type { ReactNode } from 'react';
 
+const VALID_ADDRESS = 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL';
+
+// Mock stellar-sdk classes used inside useSorobanBalance
+vi.mock('@stellar/stellar-sdk', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@stellar/stellar-sdk')>();
+  return {
+    ...actual,
+    Contract: vi.fn().mockImplementation(() => ({
+      call: vi.fn().mockReturnValue({ type: 'invokeHostFunction' }),
+    })),
+    Address: {
+      fromString: vi.fn().mockReturnValue({ toScVal: vi.fn().mockReturnValue({}) }),
+    },
+    Account: vi.fn().mockImplementation(() => ({})),
+    TransactionBuilder: vi.fn().mockImplementation(() => ({
+      addOperation: vi.fn().mockReturnThis(),
+      setTimeout: vi.fn().mockReturnThis(),
+      build: vi.fn().mockReturnValue({ toXDR: vi.fn() }),
+    })),
+    scValToNative: vi.fn().mockReturnValue(1000000n),
+  };
+});
+
 vi.mock('@stellar-solutions/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@stellar-solutions/core')>();
   return {
     ...actual,
     createClient: vi.fn(() => ({
       horizon: {},
-      rpc: {},
-      networkConfig: {},
-      withTimeout: vi.fn(),
+      rpc: {
+        simulateTransaction: vi.fn().mockResolvedValue({
+          result: { retval: {} },
+        }),
+      },
+      networkConfig: { networkPassphrase: 'Test SDF Network ; September 2015' },
+      withTimeout: vi.fn((p: Promise<unknown>) => p),
     })),
   };
 });
@@ -36,10 +63,12 @@ describe('useSorobanBalance', () => {
 
   it('returns balance string when address is provided', async () => {
     const { result } = renderHook(
-      () => useSorobanBalance('CONTRACT_ID', 'GABC123'),
+      () => useSorobanBalance('CONTRACT_ID', VALID_ADDRESS),
       { wrapper: makeWrapper() },
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(typeof result.current.data).toBe('string');
+    expect(result.current.data).toBe('1000000');
   });
+
 });

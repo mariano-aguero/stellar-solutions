@@ -1,8 +1,10 @@
-import { Asset, Keypair, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
+import { Asset, Keypair, Operation, StrKey, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { StellarClient, TxResult } from '@stellar-solutions/core';
-import { IssuerLockedError } from '@stellar-solutions/core';
+import { IssuerLockedError, InvalidAddressError, InvalidSecretKeyError, isValidAddress } from '@stellar-solutions/core';
+import { extractFeeCharged, validateAmount, validateAssetCode } from './validators.js';
 
 export interface MintOptions {
+  /** SECRET key of the issuer account. Never log or persist. */
   issuerSecretKey: string;
   assetCode: string;
   destination: string;
@@ -10,6 +12,11 @@ export interface MintOptions {
 }
 
 export async function mintTo(client: StellarClient, options: MintOptions): Promise<TxResult> {
+  if (!StrKey.isValidEd25519SecretSeed(options.issuerSecretKey)) throw new InvalidSecretKeyError();
+  if (!isValidAddress(options.destination)) throw new InvalidAddressError(options.destination);
+  validateAmount(options.amount);
+  validateAssetCode(options.assetCode);
+
   const keypair = Keypair.fromSecret(options.issuerSecretKey);
   const issuerAddress = keypair.publicKey();
 
@@ -42,7 +49,7 @@ export async function mintTo(client: StellarClient, options: MintOptions): Promi
   return {
     hash: result.hash,
     ledger: result.ledger,
-    fee: 100,
+    fee: extractFeeCharged(result, '100'),
     createdAt: new Date().toISOString(),
   };
 }

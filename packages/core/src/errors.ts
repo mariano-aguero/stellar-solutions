@@ -128,3 +128,24 @@ export class BatchValidationError extends StellarKitError {
     this.invalidIndices = copy;
   }
 }
+
+export class NoAssetCreatedError extends StellarKitError {
+  constructor() {
+    super('No asset created yet — call createAsset() first', 'NO_ASSET_CREATED');
+    this.name = 'NoAssetCreatedError';
+  }
+}
+
+export class FundingError extends StellarKitError {
+  constructor(message: string, details?: unknown) {
+    super(message, 'FUNDING_FAILED', details);
+    this.name = 'FundingError';
+  }
+}
+
+export class InvalidSecretKeyError extends StellarKitError {
+  constructor() {
+    super('Invalid secret key — must be a valid Stellar Ed25519 seed', 'INVALID_SECRET_KEY');
+    this.name = 'InvalidSecretKeyError';
+  }
+}

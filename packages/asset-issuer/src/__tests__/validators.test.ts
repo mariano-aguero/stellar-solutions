@@ -24,13 +24,22 @@ describe('validateAssetCode', () => {
 });
 
 describe('validateTotalSupply', () => {
-  it('accepts positive number', () => {
-    expect(() => validateTotalSupply(1000)).not.toThrow();
+  it('accepts positive amount string', () => {
+    expect(() => validateTotalSupply('1000')).not.toThrow();
+  });
+  it('accepts fractional amount', () => {
+    expect(() => validateTotalSupply('10.5000000')).not.toThrow();
   });
   it('throws for zero', () => {
-    expect(() => validateTotalSupply(0)).toThrow();
+    expect(() => validateTotalSupply('0')).toThrow();
   });
   it('throws for negative', () => {
-    expect(() => validateTotalSupply(-1)).toThrow();
+    expect(() => validateTotalSupply('-1')).toThrow();
+  });
+  it('throws for more than 7 decimals', () => {
+    expect(() => validateTotalSupply('1.12345678')).toThrow();
+  });
+  it('throws for leading zeros', () => {
+    expect(() => validateTotalSupply('007.5')).toThrow();
   });
 });

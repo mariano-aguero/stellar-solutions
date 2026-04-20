@@ -29,11 +29,14 @@ describe('toStroops / fromStroops', () => {
   it('round-trips: toStroops then fromStroops', () => {
     expect(fromStroops(toStroops('2.5'))).toBe('2.5000000');
   });
-  it('throws for negative amount', () => {
-    expect(() => toStroops('-1')).toThrow('invalid XLM amount');
+  it('throws InvalidAmountError for negative amount', () => {
+    expect(() => toStroops('-1')).toThrow('Invalid amount');
   });
-  it('throws for non-numeric string', () => {
-    expect(() => toStroops('abc')).toThrow('invalid XLM amount');
+  it('throws InvalidAmountError for non-numeric string', () => {
+    expect(() => toStroops('abc')).toThrow('Invalid amount');
+  });
+  it('throws InvalidAmountError for negative fromStroops', () => {
+    expect(() => fromStroops(-1n)).toThrow('Invalid amount');
   });
 });
 

@@ -1,11 +1,11 @@
-import { Asset, Keypair, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
+import { Asset, Keypair, Networks, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { StellarClient } from '@stellar-solutions/core';
 import { fundAccount } from './funding.js';
 import { validateAssetCode, validateTotalSupply } from './validators.js';
 
 export interface CreateAssetOptions {
   code: string;
-  totalSupply: number;
+  totalSupply: string;
   fundingSecretKey: string;
   lock?: boolean;
   startingBalance?: string;
@@ -14,10 +14,19 @@ export interface CreateAssetOptions {
 export interface AssetResult {
   assetCode: string;
   issuerAddress: string;
-  issuerSecretKey: string;
+  /**
+   * Non-enumerable — will NOT appear in JSON.stringify(), Object.keys(), or object spread.
+   * Access directly: result.issuerSecretKey
+   */
+  readonly issuerSecretKey: string;
   distributorAddress: string;
-  distributorSecretKey: string;
-  explorerUrl: string;
+  /**
+   * Non-enumerable — will NOT appear in JSON.stringify(), Object.keys(), or object spread.
+   * Access directly: result.distributorSecretKey
+   */
+  readonly distributorSecretKey: string;
+  /** Stellar Expert URL. Only set for testnet/mainnet — omitted for custom/standalone networks. */
+  explorerUrl?: string;
   txHashes: string[];
 }
 
@@ -30,7 +39,11 @@ export async function createAsset(
 
   const issuerKeypair = Keypair.random();
   const distributorKeypair = Keypair.random();
-  const network = client.networkConfig.networkPassphrase.includes('Test') ? 'testnet' : 'mainnet';
+  // Exact passphrase match — custom/standalone networks don't map to a Stellar Expert URL.
+  const networkLabel: 'testnet' | 'mainnet' | null =
+    client.networkConfig.networkPassphrase === Networks.PUBLIC ? 'mainnet' :
+    client.networkConfig.networkPassphrase === Networks.TESTNET ? 'testnet' :
+    null;
   const txHashes: string[] = [];
 
   // Fund both accounts
@@ -71,7 +84,7 @@ export async function createAsset(
       Operation.payment({
         destination: distributorKeypair.publicKey(),
         asset,
-        amount: String(options.totalSupply),
+        amount: options.totalSupply,
       }),
     )
     .setTimeout(180)
@@ -101,13 +114,31 @@ export async function createAsset(
     txHashes.push(lockResult.hash);
   }
 
-  return {
+  // Secret keys are set as non-enumerable so they don't appear in JSON.stringify or console.log.
+  // They remain accessible via direct property access (result.issuerSecretKey).
+  const result: Omit<AssetResult, 'issuerSecretKey' | 'distributorSecretKey'> & Partial<Pick<AssetResult, 'issuerSecretKey' | 'distributorSecretKey'>> = {
     assetCode: options.code,
     issuerAddress: issuerKeypair.publicKey(),
-    issuerSecretKey: issuerKeypair.secret(),
     distributorAddress: distributorKeypair.publicKey(),
-    distributorSecretKey: distributorKeypair.secret(),
-    explorerUrl: `https://stellar.expert/explorer/${network}/asset/${options.code}-${issuerKeypair.publicKey()}`,
+    ...(networkLabel !== null
+      ? { explorerUrl: `https://stellar.expert/explorer/${networkLabel}/asset/${options.code}-${issuerKeypair.publicKey()}` }
+      : {}),
     txHashes,
   };
+
+  Object.defineProperty(result, 'issuerSecretKey', {
+    value: issuerKeypair.secret(),
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+
+  Object.defineProperty(result, 'distributorSecretKey', {
+    value: distributorKeypair.secret(),
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+
+  return result as unknown as AssetResult;
 }

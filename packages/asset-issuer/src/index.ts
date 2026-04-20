@@ -14,7 +14,10 @@ export {
   StellarKitError,
   InvalidAssetCodeError,
   InvalidAddressError,
+  InvalidAmountError,
   IssuerLockedError,
   NetworkTimeoutError,
+  NoAssetCreatedError,
+  FundingError,
 } from '@stellar-solutions/core';
 export type { TxResult, Network } from '@stellar-solutions/core';

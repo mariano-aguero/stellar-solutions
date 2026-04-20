@@ -1,7 +1,10 @@
-import { Asset, Keypair, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
+import { Asset, Keypair, Operation, StrKey, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { StellarClient, TxResult } from '@stellar-solutions/core';
+import { isValidAddress, InvalidAddressError, InvalidSecretKeyError } from '@stellar-solutions/core';
+import { extractFeeCharged, validateAmount, validateAssetCode } from './validators.js';
 
 export interface BurnOptions {
+  /** SECRET key of the distributor account. Never log or persist. */
   distributorSecretKey: string;
   issuerAddress: string;
   assetCode: string;
@@ -9,6 +12,11 @@ export interface BurnOptions {
 }
 
 export async function burn(client: StellarClient, options: BurnOptions): Promise<TxResult> {
+  if (!StrKey.isValidEd25519SecretSeed(options.distributorSecretKey)) throw new InvalidSecretKeyError();
+  if (!isValidAddress(options.issuerAddress)) throw new InvalidAddressError(options.issuerAddress);
+  validateAmount(options.amount);
+  validateAssetCode(options.assetCode);
+
   const keypair = Keypair.fromSecret(options.distributorSecretKey);
   const distributorAddress = keypair.publicKey();
 
@@ -35,7 +43,7 @@ export async function burn(client: StellarClient, options: BurnOptions): Promise
   return {
     hash: result.hash,
     ledger: result.ledger,
-    fee: 100,
+    fee: extractFeeCharged(result, '100'),
     createdAt: new Date().toISOString(),
   };
 }

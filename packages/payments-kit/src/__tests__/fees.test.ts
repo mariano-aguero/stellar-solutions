@@ -13,9 +13,9 @@ const mockClient = {
 } as unknown as StellarClient;
 
 describe('estimateFee', () => {
-  it('returns Math.max(ceil(p50 * 1.5), 100)', async () => {
+  it('returns Math.max(ceil(p50 * 1.5), 100) as a string', async () => {
     const fee = await estimateFee(mockClient);
-    expect(fee).toBe(300); // ceil(200 * 1.5)
+    expect(fee).toBe('300'); // ceil(200 * 1.5)
   });
 
   it('returns at least 100 when p50 is very low', async () => {
@@ -29,7 +29,7 @@ describe('estimateFee', () => {
       },
     } as unknown as StellarClient;
     const fee = await estimateFee(lowClient);
-    expect(fee).toBeGreaterThanOrEqual(100);
+    expect(Number(fee)).toBeGreaterThanOrEqual(100);
   });
 
   it('uses 100 as fallback when p50 is missing', async () => {
@@ -43,6 +43,6 @@ describe('estimateFee', () => {
       },
     } as unknown as StellarClient;
     const fee = await estimateFee(noP50Client);
-    expect(fee).toBe(150); // ceil(100 * 1.5)
+    expect(fee).toBe('150'); // ceil(100 * 1.5)
   });
 });
