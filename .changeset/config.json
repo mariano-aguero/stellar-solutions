@@ -7,5 +7,11 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [
+    "example-payments-kit-node",
+    "notify-node-example",
+    "asset-issuer-node-example",
+    "batch-node-example",
+    "example-soroban-hooks-vite"
+  ]
 }

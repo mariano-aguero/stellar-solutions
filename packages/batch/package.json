@@ -1,6 +1,6 @@
 {
   "name": "@stellar-solutions/batch",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Batch payment processor for Stellar — send 100+ payments efficiently",
   "license": "MIT",
   "repository": { "type": "git", "url": "https://github.com/mariano-aguero/stellar-solutions" },

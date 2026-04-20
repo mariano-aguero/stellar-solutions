@@ -1,6 +1,6 @@
 {
   "name": "@stellar-solutions/core",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Shared utilities, types, and Horizon client for stellar-solutions SDKs",
   "license": "MIT",
   "repository": { "type": "git", "url": "https://github.com/mariano-aguero/stellar-solutions" },

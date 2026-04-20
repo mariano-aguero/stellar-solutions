@@ -1,6 +1,6 @@
 {
   "name": "@stellar-solutions/soroban-react-hooks",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "React hooks for Soroban smart contracts — wagmi-like DX for Stellar",
   "license": "MIT",
   "repository": {
