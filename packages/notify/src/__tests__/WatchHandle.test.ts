@@ -9,7 +9,7 @@ describe('WatchHandle', () => {
     handle.on('payment', listener);
 
     const event: PaymentEvent = {
-      type: 'payment', hash: 'abc', from: 'GA', to: 'GB',
+      type: 'payment', hash: 'abc', pagingToken: 'tok1', from: 'GA', to: 'GB',
       amount: '10', asset: 'native', createdAt: '2026-01-01T00:00:00Z',
     };
     handle.emit('payment', event);
@@ -22,7 +22,7 @@ describe('WatchHandle', () => {
     handle.on('soroban', listener);
 
     const event: SorobanEvent = {
-      type: 'soroban', hash: 'def', contractId: 'CCONTRACT',
+      type: 'soroban', hash: 'def', pagingToken: 'tok2', contractId: 'CCONTRACT',
       functionName: 'transfer', createdAt: '2026-01-01T00:00:00Z',
     };
     handle.emit('soroban', event);
@@ -35,7 +35,7 @@ describe('WatchHandle', () => {
     handle.on('other', listener);
 
     const event: OtherEvent = {
-      type: 'other', hash: 'ghi',
+      type: 'other', hash: 'ghi', pagingToken: 'tok3',
       operationTypes: ['create_account'], createdAt: '2026-01-01T00:00:00Z',
     };
     handle.emit('other', event);
@@ -59,7 +59,7 @@ describe('WatchHandle', () => {
     handle.off('payment', listener);
 
     const event: PaymentEvent = {
-      type: 'payment', hash: 'abc', from: 'GA', to: 'GB',
+      type: 'payment', hash: 'abc', pagingToken: 'tok4', from: 'GA', to: 'GB',
       amount: '10', asset: 'native', createdAt: '2026-01-01T00:00:00Z',
     };
     handle.emit('payment', event);

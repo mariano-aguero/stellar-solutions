@@ -1,48 +1,81 @@
-import type { HorizonTxRecord, StellarEvent, PaymentEvent, SorobanEvent, OtherEvent } from './types.js';
+import type { HorizonOperation, StellarEvent, PaymentEvent, SorobanEvent, OtherEvent } from './types.js';
 
-function assetString(op: { asset_type?: string; asset_code?: string; asset_issuer?: string }): string {
-  if (!op.asset_type || op.asset_type === 'native') return 'native';
-  return `${op.asset_code ?? ''}:${op.asset_issuer ?? ''}`;
+function assetString(assetType?: string, assetCode?: string, assetIssuer?: string): string {
+  if (!assetType || assetType === 'native') return 'native';
+  return `${assetCode ?? ''}:${assetIssuer ?? ''}`;
 }
 
-export function parseTx(tx: HorizonTxRecord): StellarEvent {
-  const ops = tx.operations ?? [];
-  const firstOp = ops[0];
+const PAYMENT_OP_TYPES = new Set(['payment', 'path_payment_strict_send', 'path_payment_strict_receive']);
 
-  if (!firstOp) {
-    const other: OtherEvent = { type: 'other', hash: tx.hash, operationTypes: [], createdAt: tx.created_at };
-    return other;
+function toPaymentFields(op: HorizonOperation): { amount: string; asset: string } {
+  // For path_payment_strict_send, `amount` is the SOURCE amount — what the destination
+  // actually received lives under `dest_amount` + `to_asset_*`. Classic payment and
+  // path_payment_strict_receive both expose the destination amount in `amount`/`asset_*`.
+  if (op.type === 'path_payment_strict_send') {
+    return {
+      amount: op.dest_amount ?? op.amount ?? '0',
+      asset: assetString(op.to_asset_type, op.to_asset_code, op.to_asset_issuer),
+    };
   }
+  return {
+    amount: op.amount ?? '0',
+    asset: assetString(op.asset_type, op.asset_code, op.asset_issuer),
+  };
+}
 
-  if (firstOp.type === 'payment') {
+/**
+ * Classify a single Horizon operation into a typed StellarEvent.
+ * Emits one event per op, so a multi-op tx produces multiple events.
+ */
+export function parseOp(op: HorizonOperation): StellarEvent {
+  if (PAYMENT_OP_TYPES.has(op.type)) {
+    const fields = toPaymentFields(op);
     const event: PaymentEvent = {
       type: 'payment',
-      hash: tx.hash,
-      from: firstOp.from ?? '',
-      to: firstOp.to ?? '',
-      amount: firstOp.amount ?? '0',
-      asset: assetString(firstOp),
-      createdAt: tx.created_at,
+      hash: op.transaction_hash,
+      pagingToken: op.paging_token,
+      from: op.from ?? op.source_account ?? '',
+      to: op.to ?? '',
+      amount: fields.amount,
+      asset: fields.asset,
+      createdAt: op.created_at,
     };
     return event;
   }
 
-  if (firstOp.type === 'invoke_host_function') {
+  if (op.type === 'create_account') {
+    // Treat account creation as a payment of XLM from funder → new account.
+    const event: PaymentEvent = {
+      type: 'payment',
+      hash: op.transaction_hash,
+      pagingToken: op.paging_token,
+      from: op.funder ?? op.source_account ?? '',
+      to: op.account ?? '',
+      amount: op.starting_balance ?? '0',
+      asset: 'native',
+      createdAt: op.created_at,
+    };
+    return event;
+  }
+
+  if (op.type === 'invoke_host_function') {
     const event: SorobanEvent = {
       type: 'soroban',
-      hash: tx.hash,
-      contractId: firstOp.contract_id ?? '',
-      functionName: firstOp.function ?? '',
-      createdAt: tx.created_at,
+      hash: op.transaction_hash,
+      pagingToken: op.paging_token,
+      contractId: op.contract_id ?? '',
+      functionName: op.function ?? '',
+      createdAt: op.created_at,
     };
     return event;
   }
 
   const other: OtherEvent = {
     type: 'other',
-    hash: tx.hash,
-    operationTypes: ops.map((op) => op.type),
-    createdAt: tx.created_at,
+    hash: op.transaction_hash,
+    pagingToken: op.paging_token,
+    operationTypes: [op.type],
+    createdAt: op.created_at,
   };
   return other;
 }

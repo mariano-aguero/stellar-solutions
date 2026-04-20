@@ -1,4 +1,4 @@
-import { createClient } from '@stellar-solutions/core';
+import { createClient, StellarKitError } from '@stellar-solutions/core';
 import type { StellarClient, Network } from '@stellar-solutions/core';
 import { WatchHandle } from './WatchHandle.js';
 import { ReconnectScheduler } from './reconnect.js';
@@ -27,7 +27,12 @@ export class StellarNotify {
     const handle = new WatchHandle();
     const reconnect = new ReconnectScheduler({
       maxRetries: this.maxRetries,
-      onMaxRetries: () => handle.emit('error', new Error(`Max retries exceeded for ${address}`)),
+      onMaxRetries: () => {
+        handle.emit('error', new StellarKitError(`Max retries exceeded for ${address}`, 'MAX_RETRIES_EXCEEDED'));
+        // Auto-cleanup the watcher entry so a subsequent watch() call creates a fresh handle
+        // rather than returning the dead one.
+        this.stop(address);
+      },
     });
     const cursor = options?.cursor;
     const stop = cursor !== undefined
