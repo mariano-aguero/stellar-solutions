@@ -1,24 +1,38 @@
 {
   "name": "@stellar-solutions/notify",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Real-time Stellar account watcher with typed events and auto-reconnect",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/mariano-aguero/stellar-solutions"
   },
-  "keywords": ["stellar", "events", "webhook", "notify"],
+  "keywords": [
+    "stellar",
+    "events",
+    "webhook",
+    "notify"
+  ],
   "type": "module",
   "exports": {
     ".": {
-      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
