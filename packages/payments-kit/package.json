@@ -1,21 +1,37 @@
 {
   "name": "@stellar-solutions/payments-kit",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Simplified payment SDK for Stellar — Stripe-like DX",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/mariano-aguero/stellar-solutions" },
-  "keywords": ["stellar", "payments", "sdk"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mariano-aguero/stellar-solutions"
+  },
+  "keywords": [
+    "stellar",
+    "payments",
+    "sdk"
+  ],
   "type": "module",
   "exports": {
     ".": {
-      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -23,8 +39,12 @@
     "test": "vitest run",
     "test:integration": "vitest run --reporter=verbose src/__tests__/integration"
   },
-  "dependencies": { "@stellar-solutions/core": "workspace:*" },
-  "peerDependencies": { "@stellar/stellar-sdk": ">=12.0.0" },
+  "dependencies": {
+    "@stellar-solutions/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@stellar/stellar-sdk": ">=12.0.0"
+  },
   "devDependencies": {
     "@stellar/stellar-sdk": "^13.0.0",
     "tsup": "^8.3.0",

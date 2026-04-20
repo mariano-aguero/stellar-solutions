@@ -1,24 +1,39 @@
 {
   "name": "@stellar-solutions/soroban-react-hooks",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "React hooks for Soroban smart contracts — wagmi-like DX for Stellar",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/mariano-aguero/stellar-solutions"
   },
-  "keywords": ["stellar", "soroban", "react", "hooks", "freighter"],
+  "keywords": [
+    "stellar",
+    "soroban",
+    "react",
+    "hooks",
+    "freighter"
+  ],
   "type": "module",
   "exports": {
     ".": {
-      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
