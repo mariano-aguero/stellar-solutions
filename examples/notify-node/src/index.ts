@@ -1,6 +1,8 @@
 import { StellarNotify } from '@stellar-solutions/notify';
 
-const WATCHED_ADDRESS = process.env['STELLAR_WATCHED_ADDRESS'] ?? 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN';
+const WATCHED_ADDRESS =
+  process.env['STELLAR_WATCHED_ADDRESS'] ??
+  'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN';
 
 const notifier = new StellarNotify({ network: 'testnet' });
 

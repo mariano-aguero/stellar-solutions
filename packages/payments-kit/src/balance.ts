@@ -1,5 +1,5 @@
-import type { StellarClient, Asset } from '@stellar-solutions/core';
-import { isValidAddress, InvalidAddressError } from '@stellar-solutions/core';
+import type { Asset, StellarClient } from '@stellar-solutions/core';
+import { InvalidAddressError, isValidAddress } from '@stellar-solutions/core';
 
 export async function getBalance(
   client: StellarClient,

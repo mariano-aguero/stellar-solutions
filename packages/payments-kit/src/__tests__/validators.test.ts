@@ -1,10 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import {
+  InvalidAddressError,
+  InvalidAmountError,
+  InvalidAssetCodeError,
+} from '@stellar-solutions/core';
+import { describe, expect, it } from 'vitest';
 import { validateAddress, validateAmount, validateAsset } from '../validators.js';
-import { InvalidAddressError, InvalidAmountError, InvalidAssetCodeError } from '@stellar-solutions/core';
 
 describe('validateAddress', () => {
   it('does not throw for valid address', () => {
-    expect(() => validateAddress('GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL')).not.toThrow();
+    expect(() =>
+      validateAddress('GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL'),
+    ).not.toThrow();
   });
   it('throws InvalidAddressError for invalid address', () => {
     expect(() => validateAddress('bad')).toThrow(InvalidAddressError);
@@ -31,12 +37,22 @@ describe('validateAsset', () => {
     expect(() => validateAsset('native')).not.toThrow();
   });
   it('does not throw for issued asset', () => {
-    expect(() => validateAsset({ code: 'USDC', issuer: 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL' })).not.toThrow();
+    expect(() =>
+      validateAsset({
+        code: 'USDC',
+        issuer: 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL',
+      }),
+    ).not.toThrow();
   });
   it('throws for issued asset with missing issuer', () => {
     expect(() => validateAsset({ code: 'USDC', issuer: '' })).toThrow();
   });
   it('throws InvalidAssetCodeError for code that is too long', () => {
-    expect(() => validateAsset({ code: 'TOOLONGCODE123', issuer: 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL' })).toThrow(InvalidAssetCodeError);
+    expect(() =>
+      validateAsset({
+        code: 'TOOLONGCODE123',
+        issuer: 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL',
+      }),
+    ).toThrow(InvalidAssetCodeError);
   });
 });

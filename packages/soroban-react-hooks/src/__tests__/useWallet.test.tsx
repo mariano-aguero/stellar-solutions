@@ -1,10 +1,10 @@
-import { vi, describe, it, expect } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useWallet } from '../hooks/useWallet.js';
 import { FreighterNotInstalledError } from '@stellar-solutions/core';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SorobanProvider } from '../context/SorobanProvider.js';
+import { QueryClient } from '@tanstack/react-query';
+import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { describe, expect, it, vi } from 'vitest';
+import { SorobanProvider } from '../context/SorobanProvider.js';
+import { useWallet } from '../hooks/useWallet.js';
 
 vi.mock('../freighter.js', () => ({
   getFreighterAddress: vi.fn(),
@@ -39,18 +39,28 @@ describe('useWallet', () => {
   });
 
   it('connect sets address and isConnected', async () => {
-    vi.mocked(getFreighterAddress).mockResolvedValue('GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37');
+    vi.mocked(getFreighterAddress).mockResolvedValue(
+      'GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37',
+    );
     const { result } = renderHook(() => useWallet(), { wrapper: TestWrapper });
-    await act(async () => { await result.current.connect(); });
+    await act(async () => {
+      await result.current.connect();
+    });
     expect(result.current.isConnected).toBe(true);
     expect(result.current.address).toBe('GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37');
   });
 
   it('disconnect clears address', async () => {
-    vi.mocked(getFreighterAddress).mockResolvedValue('GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37');
+    vi.mocked(getFreighterAddress).mockResolvedValue(
+      'GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37',
+    );
     const { result } = renderHook(() => useWallet(), { wrapper: TestWrapper });
-    await act(async () => { await result.current.connect(); });
-    act(() => { result.current.disconnect(); });
+    await act(async () => {
+      await result.current.connect();
+    });
+    act(() => {
+      result.current.disconnect();
+    });
     expect(result.current.isConnected).toBe(false);
     expect(result.current.address).toBeNull();
   });
@@ -58,20 +68,28 @@ describe('useWallet', () => {
   it('sets error on FreighterNotInstalledError', async () => {
     vi.mocked(getFreighterAddress).mockRejectedValue(new FreighterNotInstalledError());
     const { result } = renderHook(() => useWallet(), { wrapper: TestWrapper });
-    await act(async () => { await result.current.connect(); });
+    await act(async () => {
+      await result.current.connect();
+    });
     expect(result.current.error).toBeInstanceOf(FreighterNotInstalledError);
     expect(result.current.isConnected).toBe(false);
   });
 
   it('isLoading is true during connect', async () => {
     let resolve: (v: string) => void;
-    const promise = new Promise<string>((r) => { resolve = r; });
+    const promise = new Promise<string>((r) => {
+      resolve = r;
+    });
     vi.mocked(getFreighterAddress).mockReturnValue(promise);
     const { result } = renderHook(() => useWallet(), { wrapper: TestWrapper });
 
-    act(() => { void result.current.connect(); });
+    act(() => {
+      void result.current.connect();
+    });
     expect(result.current.isLoading).toBe(true);
-    await act(async () => { resolve!('GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37'); });
+    await act(async () => {
+      resolve!('GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37');
+    });
     expect(result.current.isLoading).toBe(false);
   });
 });

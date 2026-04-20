@@ -1,13 +1,13 @@
 import { EventEmitter } from 'node:events';
-import type { PaymentEvent, SorobanEvent, OtherEvent } from './types.js';
 import type { StellarKitError } from '@stellar-solutions/core';
+import type { OtherEvent, PaymentEvent, SorobanEvent } from './types.js';
 
 export class WatchHandle extends EventEmitter {
   override on(event: 'payment', listener: (tx: PaymentEvent) => void): this;
   override on(event: 'soroban', listener: (tx: SorobanEvent) => void): this;
   override on(event: 'other', listener: (tx: OtherEvent) => void): this;
   override on(event: 'error', listener: (err: Error | StellarKitError) => void): this;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: EventEmitter override fallback signature
   override on(event: string | symbol, listener: (...args: any[]) => void): this {
     return super.on(event, listener);
   }
@@ -16,7 +16,7 @@ export class WatchHandle extends EventEmitter {
   override off(event: 'soroban', listener: (tx: SorobanEvent) => void): this;
   override off(event: 'other', listener: (tx: OtherEvent) => void): this;
   override off(event: 'error', listener: (err: Error | StellarKitError) => void): this;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: EventEmitter override fallback signature
   override off(event: string | symbol, listener: (...args: any[]) => void): this {
     return super.off(event, listener);
   }
@@ -25,7 +25,7 @@ export class WatchHandle extends EventEmitter {
   override emit(event: 'soroban', tx: SorobanEvent): boolean;
   override emit(event: 'other', tx: OtherEvent): boolean;
   override emit(event: 'error', err: Error | StellarKitError): boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: EventEmitter override fallback signature
   override emit(event: string | symbol, ...args: any[]): boolean {
     return super.emit(event, ...args);
   }

@@ -1,13 +1,13 @@
+import type { Asset, StellarClient, TxResult } from '@stellar-solutions/core';
+import { InvalidSecretKeyError, SequenceError } from '@stellar-solutions/core';
 import {
-  Asset as StellarAsset,
   Keypair,
   Memo,
   Operation,
+  Asset as StellarAsset,
   StrKey,
   TransactionBuilder,
 } from '@stellar/stellar-sdk';
-import type { StellarClient, TxResult, Asset } from '@stellar-solutions/core';
-import { SequenceError, InvalidSecretKeyError } from '@stellar-solutions/core';
 import { estimateFee } from './fees.js';
 import { validateAddress, validateAmount, validateAsset } from './validators.js';
 
@@ -62,15 +62,18 @@ export async function pay(client: StellarClient, options: PaymentOptions): Promi
   validateAmount(options.amount);
   validateAsset(options.asset);
 
-  const fee = options.fee ?? await estimateFee(client);
+  const fee = options.fee ?? (await estimateFee(client));
 
   async function buildAndSubmit(retryCount = 0): Promise<TxResult> {
     const account = await client.withTimeout(client.horizon.loadAccount(sourceAddress));
 
-    const builder = new TransactionBuilder(account as ConstructorParameters<typeof TransactionBuilder>[0], {
-      fee,
-      networkPassphrase: client.networkConfig.networkPassphrase,
-    })
+    const builder = new TransactionBuilder(
+      account as ConstructorParameters<typeof TransactionBuilder>[0],
+      {
+        fee,
+        networkPassphrase: client.networkConfig.networkPassphrase,
+      },
+    )
       .addOperation(
         Operation.payment({
           destination: options.to,

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { StellarBatch } from '../../StellarBatch.js';
 
 const SECRET = process.env['STELLAR_TEST_SECRET_KEY'];

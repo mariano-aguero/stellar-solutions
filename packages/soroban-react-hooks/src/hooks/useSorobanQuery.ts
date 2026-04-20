@@ -1,12 +1,12 @@
 'use client';
 
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
-import type { rpc } from '@stellar/stellar-sdk';
 import { StellarKitError } from '@stellar-solutions/core';
+import type { rpc } from '@stellar/stellar-sdk';
+import { type UseQueryResult, useQuery } from '@tanstack/react-query';
 import { useSorobanContext } from '../context/SorobanContext.js';
 
 export interface UseSorobanQueryOptions<T> {
-  queryFn?: (rpc: rpc.Server) => Promise<T>;
+  queryFn?: (rpcServer: rpc.Server) => Promise<T>;
   /**
    * Query arguments — included in the queryKey as a JSON-stringified segment so
    * callers passing fresh object/array literals on each render do NOT trigger
@@ -34,7 +34,10 @@ export function useSorobanQuery<T>(
     queryKey: ['soroban', contractId, methodName, argsKey],
     queryFn: async () => {
       if (options.queryFn !== undefined) return options.queryFn(client.rpc);
-      throw new StellarKitError(`No queryFn provided for ${contractId}.${methodName}`, 'NO_QUERY_FN');
+      throw new StellarKitError(
+        `No queryFn provided for ${contractId}.${methodName}`,
+        'NO_QUERY_FN',
+      );
     },
     ...(options.enabled !== undefined ? { enabled: options.enabled } : {}),
     ...(options.staleTime !== undefined ? { staleTime: options.staleTime } : { staleTime: 10_000 }),

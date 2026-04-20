@@ -29,7 +29,7 @@ const result = await batch.send(payments, {
 });
 
 console.log('\n');
-console.log(`Done!`);
+console.log('Done!');
 console.log(`  Successful: ${result.successful}`);
 console.log(`  Failed:     ${result.failed}`);
 console.log(`  Tx hashes:  ${result.txHashes.join(', ')}`);

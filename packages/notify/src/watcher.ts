@@ -1,8 +1,8 @@
 import type { StellarClient } from '@stellar-solutions/core';
 import { StellarKitError } from '@stellar-solutions/core';
 import type { WatchHandle } from './WatchHandle.js';
-import type { ReconnectScheduler } from './reconnect.js';
 import { parseOp } from './parser.js';
+import type { ReconnectScheduler } from './reconnect.js';
 import type { HorizonOperation } from './types.js';
 
 interface StreamOptions {

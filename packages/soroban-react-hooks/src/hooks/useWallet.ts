@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useState } from 'react';
 import { StellarKitError } from '@stellar-solutions/core';
+import { useCallback, useState } from 'react';
 import { useSorobanContext } from '../context/SorobanContext.js';
 import { getFreighterAddress } from '../freighter.js';
 

@@ -1,13 +1,13 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { StellarKitError } from '@stellar-solutions/core';
 import type { TxResult } from '@stellar-solutions/core';
-import { useSorobanContext } from '../context/SorobanContext.js';
 import type { rpc } from '@stellar/stellar-sdk';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSorobanContext } from '../context/SorobanContext.js';
 
 export interface UseSorobanInvokeOptions<TArgs extends readonly unknown[] = readonly unknown[]> {
-  mutateFn?: (rpc: rpc.Server, args: TArgs) => Promise<TxResult>;
+  mutateFn?: (rpcServer: rpc.Server, args: TArgs) => Promise<TxResult>;
 }
 
 export interface SorobanInvokeResult<TArgs extends readonly unknown[] = readonly unknown[]> {
@@ -41,11 +41,12 @@ export function useSorobanInvoke<TArgs extends readonly unknown[] = readonly unk
   });
 
   // Normalize all errors to StellarKitError so consumers always deal with a consistent type.
-  const error = mutation.error instanceof StellarKitError
-    ? mutation.error
-    : mutation.error !== null
-    ? new StellarKitError(mutation.error.message, 'UNKNOWN')
-    : null;
+  const error =
+    mutation.error instanceof StellarKitError
+      ? mutation.error
+      : mutation.error !== null
+        ? new StellarKitError(mutation.error.message, 'UNKNOWN')
+        : null;
 
   return {
     invoke: mutation.mutateAsync,

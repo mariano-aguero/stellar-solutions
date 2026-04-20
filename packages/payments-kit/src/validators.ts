@@ -1,4 +1,10 @@
-import { isValidAddress, InvalidAddressError, InvalidAmountError, InvalidAssetCodeError, toStroops } from '@stellar-solutions/core';
+import {
+  InvalidAddressError,
+  InvalidAmountError,
+  InvalidAssetCodeError,
+  isValidAddress,
+  toStroops,
+} from '@stellar-solutions/core';
 import type { Asset } from '@stellar-solutions/core';
 
 export function validateAddress(address: string): void {

@@ -1,16 +1,19 @@
 import type { BatchPayment, StellarClient } from '@stellar-solutions/core';
 import { StellarKitError } from '@stellar-solutions/core';
 import { Keypair } from '@stellar/stellar-sdk';
-import { ResultCollector } from './result-collector.js';
 import { executeChunks } from './executor.js';
 import type { ExecuteOptions } from './executor.js';
+import { ResultCollector } from './result-collector.js';
 
 export class ChannelPool {
   private readonly keypairs: Keypair[];
 
   constructor(secretKeys: string[]) {
     if (secretKeys.length === 0) {
-      throw new StellarKitError('ChannelPool requires at least one secret key', 'INVALID_CHANNEL_CONFIG');
+      throw new StellarKitError(
+        'ChannelPool requires at least one secret key',
+        'INVALID_CHANNEL_CONFIG',
+      );
     }
     this.keypairs = secretKeys.map((sk) => Keypair.fromSecret(sk));
   }
@@ -44,7 +47,8 @@ export class ChannelPool {
 
     for (let i = 0; i < chunks.length; i += this.keypairs.length) {
       const batchIndices: number[] = [];
-      for (let k = i; k < Math.min(i + this.keypairs.length, chunks.length); k++) batchIndices.push(k);
+      for (let k = i; k < Math.min(i + this.keypairs.length, chunks.length); k++)
+        batchIndices.push(k);
 
       // allSettled so a thrown error in one channel doesn't abort the remaining
       // parallel chunks. Any unexpected throw is recorded as a failure for that chunk.

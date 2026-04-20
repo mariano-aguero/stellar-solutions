@@ -1,6 +1,4 @@
-export type Asset =
-  | 'native'
-  | { code: string; issuer: string };
+export type Asset = 'native' | { code: string; issuer: string };
 
 export interface TxResult {
   hash: string;

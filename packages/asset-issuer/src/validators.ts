@@ -1,4 +1,4 @@
-import { InvalidAssetCodeError, InvalidAmountError, toStroops } from '@stellar-solutions/core';
+import { InvalidAmountError, InvalidAssetCodeError, toStroops } from '@stellar-solutions/core';
 
 /** Asset codes in Stellar classic credit assets are A-Z0-9, 1-12 chars (uppercase). */
 export function validateAssetCode(code: string): void {

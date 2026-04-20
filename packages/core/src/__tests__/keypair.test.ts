@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { isValidAddress, toStroops, fromStroops, publicFromSecret } from '../keypair.js';
+import { describe, expect, it } from 'vitest';
+import { fromStroops, isValidAddress, publicFromSecret, toStroops } from '../keypair.js';
 
 describe('isValidAddress', () => {
   it('returns true for valid G... address', () => {

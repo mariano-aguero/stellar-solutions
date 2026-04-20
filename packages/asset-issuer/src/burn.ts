@@ -1,6 +1,10 @@
-import { Asset, Keypair, Operation, StrKey, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { StellarClient, TxResult } from '@stellar-solutions/core';
-import { isValidAddress, InvalidAddressError, InvalidSecretKeyError } from '@stellar-solutions/core';
+import {
+  InvalidAddressError,
+  InvalidSecretKeyError,
+  isValidAddress,
+} from '@stellar-solutions/core';
+import { Asset, Keypair, Operation, StrKey, TransactionBuilder } from '@stellar/stellar-sdk';
 import { extractFeeCharged, validateAmount, validateAssetCode } from './validators.js';
 
 export interface BurnOptions {
@@ -12,7 +16,8 @@ export interface BurnOptions {
 }
 
 export async function burn(client: StellarClient, options: BurnOptions): Promise<TxResult> {
-  if (!StrKey.isValidEd25519SecretSeed(options.distributorSecretKey)) throw new InvalidSecretKeyError();
+  if (!StrKey.isValidEd25519SecretSeed(options.distributorSecretKey))
+    throw new InvalidSecretKeyError();
   if (!isValidAddress(options.issuerAddress)) throw new InvalidAddressError(options.issuerAddress);
   validateAmount(options.amount);
   validateAssetCode(options.assetCode);

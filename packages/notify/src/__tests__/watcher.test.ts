@@ -1,16 +1,22 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { StellarClient } from '@stellar-solutions/core';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WatchHandle } from '../WatchHandle.js';
 import { ReconnectScheduler } from '../reconnect.js';
-import { startWatcher } from '../watcher.js';
 import type { HorizonOperation } from '../types.js';
+import { startWatcher } from '../watcher.js';
 
 function makeMockClient(onmessageFn?: (cb: (op: HorizonOperation) => void) => void) {
   const streamStop = vi.fn();
-  const streamMock = vi.fn().mockImplementation(({ onmessage }: { onmessage: (op: HorizonOperation) => void; onerror: (err: unknown) => void }) => {
-    if (onmessageFn) onmessageFn(onmessage);
-    return streamStop;
-  });
+  const streamMock = vi
+    .fn()
+    .mockImplementation(
+      ({
+        onmessage,
+      }: { onmessage: (op: HorizonOperation) => void; onerror: (err: unknown) => void }) => {
+        if (onmessageFn) onmessageFn(onmessage);
+        return streamStop;
+      },
+    );
 
   return {
     client: {
@@ -29,8 +35,12 @@ function makeMockClient(onmessageFn?: (cb: (op: HorizonOperation) => void) => vo
 }
 
 describe('startWatcher', () => {
-  beforeEach(() => { vi.useFakeTimers(); });
-  afterEach(() => { vi.useRealTimers(); });
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it('starts streaming and emits payment event on message', () => {
     const paymentOp: HorizonOperation = {
@@ -62,14 +72,24 @@ describe('startWatcher', () => {
     let capturedOnmessage: ((op: HorizonOperation) => void) | undefined;
     let capturedOnerror: ((err: unknown) => void) | undefined;
 
-    const streamMock = vi.fn().mockImplementation(({ onmessage, onerror }: { onmessage: (op: HorizonOperation) => void; onerror: (err: unknown) => void }) => {
-      capturedOnmessage = onmessage;
-      capturedOnerror = onerror;
-      return streamStop;
-    });
+    const streamMock = vi
+      .fn()
+      .mockImplementation(
+        ({
+          onmessage,
+          onerror,
+        }: { onmessage: (op: HorizonOperation) => void; onerror: (err: unknown) => void }) => {
+          capturedOnmessage = onmessage;
+          capturedOnerror = onerror;
+          return streamStop;
+        },
+      );
     const builderMock = {
       forAccount: vi.fn().mockReturnThis(),
-      cursor: vi.fn().mockImplementation((c: string) => { capturedCursors.push(c); return builderMock; }),
+      cursor: vi.fn().mockImplementation((c: string) => {
+        capturedCursors.push(c);
+        return builderMock;
+      }),
       stream: streamMock,
     };
     const client = {

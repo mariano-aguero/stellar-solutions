@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, renderHook } from '@testing-library/react';
-import { SorobanProvider } from '../context/SorobanProvider.js';
-import { useSorobanContext } from '../context/SorobanContext.js';
 import { QueryClient } from '@tanstack/react-query';
+import { render, renderHook, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { useSorobanContext } from '../context/SorobanContext.js';
+import { SorobanProvider } from '../context/SorobanProvider.js';
 
 // Mock createClient to avoid real network connections
 vi.mock('@stellar-solutions/core', async (importOriginal) => {
@@ -39,9 +39,9 @@ describe('SorobanProvider', () => {
   });
 
   it('throws when useSorobanContext used outside provider', () => {
-    expect(() =>
-      renderHook(() => useSorobanContext()),
-    ).toThrow('useSorobanContext must be used within a SorobanProvider');
+    expect(() => renderHook(() => useSorobanContext())).toThrow(
+      'useSorobanContext must be used within a SorobanProvider',
+    );
   });
 
   it('walletAddress starts as null', () => {

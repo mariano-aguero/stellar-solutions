@@ -1,8 +1,8 @@
-import { vi, describe, it, expect } from 'vitest';
+import type { StellarClient } from '@stellar-solutions/core';
 import { Keypair } from '@stellar/stellar-sdk';
+import { describe, expect, it, vi } from 'vitest';
 import { executeChunks } from '../executor.js';
 import { ResultCollector } from '../result-collector.js';
-import type { StellarClient } from '@stellar-solutions/core';
 
 const payment = {
   to: 'GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37',
@@ -53,9 +53,9 @@ describe('executeChunks', () => {
     const client = makeClient({ hash: 'hash1', ledger: 1 });
     const collector = new ResultCollector();
     const chunks = [
-      Array(100).fill(payment) as typeof payment[],
-      Array(100).fill(payment) as typeof payment[],
-      Array(50).fill(payment) as typeof payment[],
+      Array(100).fill(payment) as (typeof payment)[],
+      Array(100).fill(payment) as (typeof payment)[],
+      Array(50).fill(payment) as (typeof payment)[],
     ];
     await executeChunks(client, keypair, chunks, collector);
     expect(client.horizon.submitTransaction).toHaveBeenCalledTimes(3);
@@ -70,13 +70,18 @@ describe('executeChunks', () => {
     await executeChunks(client, keypair, [[payment], [payment, payment]], collector, {
       onProgress: (done, total) => progress.push([done, total]),
     });
-    expect(progress).toEqual([[1, 3], [3, 3]]);
+    expect(progress).toEqual([
+      [1, 3],
+      [3, 3],
+    ]);
   });
 
   it('records failure when submit throws non-retryable error', async () => {
     const keypair = Keypair.random();
     const client = makeClient(null);
-    (client.horizon.submitTransaction as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('tx_failed'));
+    (client.horizon.submitTransaction as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error('tx_failed'),
+    );
     const collector = new ResultCollector();
     await executeChunks(client, keypair, [[payment]], collector);
     const result = collector.toBatchResult();

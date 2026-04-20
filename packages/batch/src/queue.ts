@@ -1,4 +1,9 @@
-import { EmptyBatchError, BatchValidationError, isValidAddress, toStroops } from '@stellar-solutions/core';
+import {
+  BatchValidationError,
+  EmptyBatchError,
+  isValidAddress,
+  toStroops,
+} from '@stellar-solutions/core';
 import type { BatchPayment } from '@stellar-solutions/core';
 
 function isValidPositiveAmount(amount: string): boolean {

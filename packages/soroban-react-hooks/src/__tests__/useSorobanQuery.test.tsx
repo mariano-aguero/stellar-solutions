@@ -1,9 +1,9 @@
-import { vi, describe, it, expect } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { useSorobanQuery } from '../hooks/useSorobanQuery.js';
 import { QueryClient } from '@tanstack/react-query';
-import { SorobanProvider } from '../context/SorobanProvider.js';
+import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { describe, expect, it, vi } from 'vitest';
+import { SorobanProvider } from '../context/SorobanProvider.js';
+import { useSorobanQuery } from '../hooks/useSorobanQuery.js';
 
 vi.mock('@stellar-solutions/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@stellar-solutions/core')>();
@@ -21,16 +21,21 @@ vi.mock('@stellar-solutions/core', async (importOriginal) => {
 function makeWrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return function Wrapper({ children }: { children: ReactNode }) {
-    return <SorobanProvider network="testnet" queryClient={qc}>{children}</SorobanProvider>;
+    return (
+      <SorobanProvider network="testnet" queryClient={qc}>
+        {children}
+      </SorobanProvider>
+    );
   };
 }
 
 describe('useSorobanQuery', () => {
   it('returns data from queryFn', async () => {
     const { result } = renderHook(
-      () => useSorobanQuery<string>('CONTRACT_ID', 'hello', {
-        queryFn: async () => 'world',
-      }),
+      () =>
+        useSorobanQuery<string>('CONTRACT_ID', 'hello', {
+          queryFn: async () => 'world',
+        }),
       { wrapper: makeWrapper() },
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -39,10 +44,11 @@ describe('useSorobanQuery', () => {
 
   it('is disabled when enabled: false', () => {
     const { result } = renderHook(
-      () => useSorobanQuery<string>('CONTRACT_ID', 'hello', {
-        queryFn: async () => 'world',
-        enabled: false,
-      }),
+      () =>
+        useSorobanQuery<string>('CONTRACT_ID', 'hello', {
+          queryFn: async () => 'world',
+          enabled: false,
+        }),
       { wrapper: makeWrapper() },
     );
     expect(result.current.fetchStatus).toBe('idle');
@@ -50,10 +56,9 @@ describe('useSorobanQuery', () => {
   });
 
   it('throws when no queryFn provided', async () => {
-    const { result } = renderHook(
-      () => useSorobanQuery<string>('CONTRACT_ID', 'hello'),
-      { wrapper: makeWrapper() },
-    );
+    const { result } = renderHook(() => useSorobanQuery<string>('CONTRACT_ID', 'hello'), {
+      wrapper: makeWrapper(),
+    });
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error?.message).toContain('No queryFn provided');
   });

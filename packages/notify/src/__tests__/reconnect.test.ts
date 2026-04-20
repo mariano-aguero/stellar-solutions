@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ReconnectScheduler } from '../reconnect.js';
 
 afterEach(() => {
@@ -24,9 +24,9 @@ describe('ReconnectScheduler', () => {
     const onMaxRetries = vi.fn();
     const scheduler = new ReconnectScheduler({ maxRetries: 5, onMaxRetries });
 
-    scheduler.scheduleRetry(() => {});  // attempt 0 → 1000ms, increments to attempt 1
+    scheduler.scheduleRetry(() => {}); // attempt 0 → 1000ms, increments to attempt 1
     vi.advanceTimersByTime(1000);
-    scheduler.scheduleRetry(cb);        // attempt 1 → 2000ms
+    scheduler.scheduleRetry(cb); // attempt 1 → 2000ms
     expect(cb).not.toHaveBeenCalled();
     vi.advanceTimersByTime(2000);
     expect(cb).toHaveBeenCalledOnce();
@@ -55,8 +55,10 @@ describe('ReconnectScheduler', () => {
     const scheduler = new ReconnectScheduler({ maxRetries: 2, onMaxRetries });
 
     // Use up all retries
-    scheduler.scheduleRetry(() => {}); vi.advanceTimersByTime(1000);  // attempt 0
-    scheduler.scheduleRetry(() => {}); vi.advanceTimersByTime(2000);  // attempt 1
+    scheduler.scheduleRetry(() => {});
+    vi.advanceTimersByTime(1000); // attempt 0
+    scheduler.scheduleRetry(() => {});
+    vi.advanceTimersByTime(2000); // attempt 1
     // Now at attempt 2 which equals maxRetries
     scheduler.scheduleRetry(() => {});
 
@@ -70,8 +72,10 @@ describe('ReconnectScheduler', () => {
     const scheduler = new ReconnectScheduler({ maxRetries: 5, onMaxRetries });
 
     // Advance to attempt 2
-    scheduler.scheduleRetry(() => {}); vi.advanceTimersByTime(1000);
-    scheduler.scheduleRetry(() => {}); vi.advanceTimersByTime(2000);
+    scheduler.scheduleRetry(() => {});
+    vi.advanceTimersByTime(1000);
+    scheduler.scheduleRetry(() => {});
+    vi.advanceTimersByTime(2000);
 
     scheduler.reset();
 

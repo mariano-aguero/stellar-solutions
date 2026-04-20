@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
-import { Keypair } from '@stellar/stellar-sdk';
-import { pay } from '../pay.js';
 import type { StellarClient } from '@stellar-solutions/core';
-import { SequenceError, InvalidSecretKeyError } from '@stellar-solutions/core';
+import { InvalidSecretKeyError, SequenceError } from '@stellar-solutions/core';
+import { Keypair } from '@stellar/stellar-sdk';
+import { describe, expect, it, vi } from 'vitest';
+import { pay } from '../pay.js';
 
 // Known-valid Stellar keypair for testing
 const TEST_SECRET = 'SCN6I4YH2IR7SZ6RHYQMI2TCTS4VXG6MGS4APWXYEUH26VFMYPQMUT5A';
@@ -27,12 +27,16 @@ function makeMockAccount() {
   };
 }
 
-function makeMockClient(overrides?: Partial<{ submitResult: unknown; loadAccountFn: ReturnType<typeof vi.fn> }>): StellarClient {
+function makeMockClient(
+  overrides?: Partial<{ submitResult: unknown; loadAccountFn: ReturnType<typeof vi.fn> }>,
+): StellarClient {
   return {
     horizon: {
       loadAccount: overrides?.loadAccountFn ?? vi.fn().mockResolvedValue(makeMockAccount()),
       submitTransaction: vi.fn().mockResolvedValue(overrides?.submitResult ?? mockSubmitResult),
-      feeStats: vi.fn().mockResolvedValue({ fee_charged: { p50: '100' }, base_fee_in_stroops: '100' }),
+      feeStats: vi
+        .fn()
+        .mockResolvedValue({ fee_charged: { p50: '100' }, base_fee_in_stroops: '100' }),
     },
     networkConfig: { networkPassphrase: 'Test SDF Network ; September 2015' },
     withTimeout: (p: Promise<unknown>) => p,
@@ -42,12 +46,14 @@ function makeMockClient(overrides?: Partial<{ submitResult: unknown; loadAccount
 describe('pay — validation', () => {
   it('throws InvalidSecretKeyError for invalid secret key', async () => {
     const client = makeMockClient();
-    await expect(pay(client, {
-      from: 'NOTASECRETKEY',
-      to: TEST_DEST,
-      amount: '1',
-      asset: 'native',
-    })).rejects.toThrow(InvalidSecretKeyError);
+    await expect(
+      pay(client, {
+        from: 'NOTASECRETKEY',
+        to: TEST_DEST,
+        amount: '1',
+        asset: 'native',
+      }),
+    ).rejects.toThrow(InvalidSecretKeyError);
   });
 });
 
@@ -66,7 +72,9 @@ describe('pay — happy path', () => {
   });
 
   it('uses provided fee instead of estimating', async () => {
-    const feeStatsMock = vi.fn().mockResolvedValue({ fee_charged: { p50: '100' }, base_fee_in_stroops: '100' });
+    const feeStatsMock = vi
+      .fn()
+      .mockResolvedValue({ fee_charged: { p50: '100' }, base_fee_in_stroops: '100' });
     const client = {
       horizon: {
         loadAccount: vi.fn().mockResolvedValue(makeMockAccount()),
@@ -93,15 +101,20 @@ describe('pay — happy path', () => {
 describe('pay — sequence retry', () => {
   it('retries once on tx_bad_seq then succeeds', async () => {
     const loadAccountFn = vi.fn().mockResolvedValue(makeMockAccount());
-    const badSeqError = { response: { data: { extras: { result_codes: { transaction: 'tx_bad_seq' } } } } };
-    const submitMock = vi.fn()
+    const badSeqError = {
+      response: { data: { extras: { result_codes: { transaction: 'tx_bad_seq' } } } },
+    };
+    const submitMock = vi
+      .fn()
       .mockRejectedValueOnce(badSeqError)
       .mockResolvedValueOnce(mockSubmitResult);
     const client = {
       horizon: {
         loadAccount: loadAccountFn,
         submitTransaction: submitMock,
-        feeStats: vi.fn().mockResolvedValue({ fee_charged: { p50: '100' }, base_fee_in_stroops: '100' }),
+        feeStats: vi
+          .fn()
+          .mockResolvedValue({ fee_charged: { p50: '100' }, base_fee_in_stroops: '100' }),
       },
       networkConfig: { networkPassphrase: 'Test SDF Network ; September 2015' },
       withTimeout: (p: Promise<unknown>) => p,
@@ -120,22 +133,28 @@ describe('pay — sequence retry', () => {
   });
 
   it('throws SequenceError when tx_bad_seq persists after retry', async () => {
-    const badSeqError = { response: { data: { extras: { result_codes: { transaction: 'tx_bad_seq' } } } } };
+    const badSeqError = {
+      response: { data: { extras: { result_codes: { transaction: 'tx_bad_seq' } } } },
+    };
     const client = {
       horizon: {
         loadAccount: vi.fn().mockResolvedValue(makeMockAccount()),
         submitTransaction: vi.fn().mockRejectedValue(badSeqError),
-        feeStats: vi.fn().mockResolvedValue({ fee_charged: { p50: '100' }, base_fee_in_stroops: '100' }),
+        feeStats: vi
+          .fn()
+          .mockResolvedValue({ fee_charged: { p50: '100' }, base_fee_in_stroops: '100' }),
       },
       networkConfig: { networkPassphrase: 'Test SDF Network ; September 2015' },
       withTimeout: (p: Promise<unknown>) => p,
     } as unknown as StellarClient;
 
-    await expect(pay(client, {
-      from: TEST_SECRET,
-      to: TEST_DEST,
-      amount: '1',
-      asset: 'native',
-    })).rejects.toThrow(SequenceError);
+    await expect(
+      pay(client, {
+        from: TEST_SECRET,
+        to: TEST_DEST,
+        amount: '1',
+        asset: 'native',
+      }),
+    ).rejects.toThrow(SequenceError);
   });
 });

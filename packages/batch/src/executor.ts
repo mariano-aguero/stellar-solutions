@@ -1,5 +1,5 @@
-import { Asset, Keypair, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { BatchPayment, StellarClient } from '@stellar-solutions/core';
+import { Asset, type Keypair, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { ResultCollector } from './result-collector.js';
 
 export interface ExecuteOptions {
@@ -47,9 +47,10 @@ async function submitChunkWithRetry(
     });
 
     for (const payment of chunk) {
-      const asset = payment.asset === 'native'
-        ? Asset.native()
-        : new Asset(payment.asset.code, payment.asset.issuer);
+      const asset =
+        payment.asset === 'native'
+          ? Asset.native()
+          : new Asset(payment.asset.code, payment.asset.issuer);
       builder.addOperation(
         Operation.payment({ destination: payment.to, asset, amount: payment.amount }),
       );
@@ -62,10 +63,28 @@ async function submitChunkWithRetry(
   } catch (err: unknown) {
     // bad_seq is retried at most once regardless of attempt number — sequence skew can happen any time.
     if (isBadSeqError(err) && badSeqRetries === 0) {
-      return submitChunkWithRetry(client, keypair, chunk, startIndex, collector, maxRetries, attempt, 1);
+      return submitChunkWithRetry(
+        client,
+        keypair,
+        chunk,
+        startIndex,
+        collector,
+        maxRetries,
+        attempt,
+        1,
+      );
     }
     if (isRetryableError(err) && attempt < maxRetries) {
-      return submitChunkWithRetry(client, keypair, chunk, startIndex, collector, maxRetries, attempt + 1, badSeqRetries);
+      return submitChunkWithRetry(
+        client,
+        keypair,
+        chunk,
+        startIndex,
+        collector,
+        maxRetries,
+        attempt + 1,
+        badSeqRetries,
+      );
     }
     const reason = err instanceof Error ? err.message : String(err);
     const code = extractTxResultCode(err);
@@ -93,7 +112,9 @@ function isBadSeqError(err: unknown): boolean {
 function isRetryableError(err: unknown): boolean {
   if (err == null || typeof err !== 'object') return false;
   const msg = (err as Error).message ?? '';
-  return msg.includes('timeout') || msg.includes('tx_too_late') || msg.includes('NetworkTimeoutError');
+  return (
+    msg.includes('timeout') || msg.includes('tx_too_late') || msg.includes('NetworkTimeoutError')
+  );
 }
 
 function extractTxResultCode(err: unknown): string | undefined {

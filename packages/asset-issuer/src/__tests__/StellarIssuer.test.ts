@@ -1,8 +1,8 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { StellarIssuer } from '../StellarIssuer.js';
 import { NoAssetCreatedError } from '@stellar-solutions/core';
-import type { AssetResult } from '../createAsset.js';
 import type { TxResult } from '@stellar-solutions/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { StellarIssuer } from '../StellarIssuer.js';
+import type { AssetResult } from '../createAsset.js';
 import type { Holder } from '../holders.js';
 
 vi.mock('../createAsset.js', () => ({ createAsset: vi.fn() }));
@@ -15,10 +15,10 @@ vi.mock('@stellar-solutions/core', async (importOriginal) => {
   return { ...actual, createClient: vi.fn(() => ({})) };
 });
 
-import { createAsset as mockCreateAsset } from '../createAsset.js';
-import { mintTo as mockMintTo } from '../mint.js';
 import { burn as mockBurn } from '../burn.js';
+import { createAsset as mockCreateAsset } from '../createAsset.js';
 import { getHolders as mockGetHolders } from '../holders.js';
+import { mintTo as mockMintTo } from '../mint.js';
 
 const MOCK_ASSET_RESULT: AssetResult = {
   assetCode: 'MYTKN',
@@ -37,9 +37,7 @@ const MOCK_TX_RESULT: TxResult = {
   createdAt: '2026-04-15T00:00:00.000Z',
 };
 
-const MOCK_HOLDERS: Holder[] = [
-  { address: 'GHOLDER1', balance: '1000.0000000' },
-];
+const MOCK_HOLDERS: Holder[] = [{ address: 'GHOLDER1', balance: '1000.0000000' }];
 
 describe('StellarIssuer', () => {
   let issuer: StellarIssuer;

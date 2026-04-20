@@ -1,7 +1,7 @@
 'use client';
 
-import * as FreighterAPI from '@stellar/freighter-api';
 import { FreighterNotInstalledError, NetworkMismatchError } from '@stellar-solutions/core';
+import * as FreighterAPI from '@stellar/freighter-api';
 
 // Freighter returns well-known network strings; map them to our canonical Network values.
 // Strict mapping prevents false matches like "futurenet" matching expectedNetwork="test".

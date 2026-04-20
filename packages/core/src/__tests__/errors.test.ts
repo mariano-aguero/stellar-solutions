@@ -1,19 +1,15 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  StellarKitError,
+  BatchValidationError,
+  EmptyBatchError,
+  InsufficientFundsError,
   InvalidAddressError,
   InvalidAmountError,
-  InsufficientFundsError,
+  InvalidAssetCodeError,
   NetworkTimeoutError,
   NoTrustlineError,
   SequenceError,
-  InvalidAssetCodeError,
-  AssetAlreadyExistsError,
-  IssuerLockedError,
-  FreighterNotInstalledError,
-  NetworkMismatchError,
-  EmptyBatchError,
-  BatchValidationError,
+  StellarKitError,
 } from '../errors.js';
 
 describe('StellarKitError', () => {

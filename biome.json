@@ -17,6 +17,12 @@
       "suspicious": {
         "noExplicitAny": "error",
         "noConsoleLog": "error"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "complexity": {
+        "useLiteralKeys": "off"
       }
     }
   },
@@ -28,6 +34,39 @@
     }
   },
   "files": {
-    "ignore": ["**/dist/**", "**/node_modules/**", "**/*.d.ts"]
-  }
+    "ignore": [
+      "**/dist/**",
+      "**/node_modules/**",
+      "**/*.d.ts",
+      "**/.turbo/**",
+      ".worktrees/**",
+      "pnpm-lock.yaml"
+    ]
+  },
+  "overrides": [
+    {
+      "include": ["examples/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsoleLog": "off"
+          },
+          "a11y": {
+            "useButtonType": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["**/__tests__/**", "**/*.test.ts", "**/*.test.tsx"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noConsoleLog": "off"
+          }
+        }
+      }
+    }
+  ]
 }

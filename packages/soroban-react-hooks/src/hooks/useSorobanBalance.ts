@@ -1,8 +1,15 @@
 'use client';
 
-import { Contract, Address, Account, TransactionBuilder, rpc as RpcModule, scValToNative } from '@stellar/stellar-sdk';
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { StellarKitError } from '@stellar-solutions/core';
+import {
+  Account,
+  Address,
+  Contract,
+  rpc as RpcModule,
+  TransactionBuilder,
+  scValToNative,
+} from '@stellar/stellar-sdk';
+import { type UseQueryResult, useQuery } from '@tanstack/react-query';
 import { useSorobanContext } from '../context/SorobanContext.js';
 
 export function useSorobanBalance(

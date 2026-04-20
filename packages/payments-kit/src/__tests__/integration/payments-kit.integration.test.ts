@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { StellarKit } from '../../StellarKit.js';
 
 const SECRET = process.env['STELLAR_TEST_SECRET_KEY'];

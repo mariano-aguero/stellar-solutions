@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
 import type { StellarClient } from '@stellar-solutions/core';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fundAccount } from '../funding.js';
 
 afterEach(() => vi.restoreAllMocks());
@@ -21,12 +21,8 @@ describe('fundAccount — testnet (Friendbot)', () => {
 
     await fundAccount(mockClient, 'GDEST', { fundingSecretKey: '' });
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('friendbot.stellar.org'),
-    );
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('GDEST'),
-    );
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('friendbot.stellar.org'));
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('GDEST'));
   });
 
   it('throws if Friendbot returns non-ok response', async () => {

@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { validateAssetCode, validateTotalSupply } from '../validators.js';
 import { InvalidAssetCodeError } from '@stellar-solutions/core';
+import { describe, expect, it } from 'vitest';
+import { validateAssetCode, validateTotalSupply } from '../validators.js';
 
 describe('validateAssetCode', () => {
   it('accepts valid 1-char code', () => {

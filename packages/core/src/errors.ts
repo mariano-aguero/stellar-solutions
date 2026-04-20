@@ -52,10 +52,7 @@ export class SequenceError extends StellarKitError {
 
 export class InvalidAmountError extends StellarKitError {
   constructor(amount: string) {
-    super(
-      `Invalid amount: "${amount}" — must be a positive number`,
-      'INVALID_AMOUNT',
-    );
+    super(`Invalid amount: "${amount}" — must be a positive number`, 'INVALID_AMOUNT');
     this.name = 'InvalidAmountError';
   }
 }
@@ -79,10 +76,7 @@ export class AssetAlreadyExistsError extends StellarKitError {
 
 export class IssuerLockedError extends StellarKitError {
   constructor() {
-    super(
-      'Issuer account is locked — minting is disabled. This is permanent.',
-      'ISSUER_LOCKED',
-    );
+    super('Issuer account is locked — minting is disabled. This is permanent.', 'ISSUER_LOCKED');
     this.name = 'IssuerLockedError';
   }
 }

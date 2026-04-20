@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
 import type { StellarClient } from '@stellar-solutions/core';
 import { InvalidAddressError } from '@stellar-solutions/core';
+import { describe, expect, it, vi } from 'vitest';
 import { getHistory } from '../history.js';
 
 const mockTx = {
@@ -28,7 +28,11 @@ describe('getHistory', () => {
   });
 
   it('returns an array of HistoryEntry', async () => {
-    const result = await getHistory(mockClient, 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL', { limit: 10 });
+    const result = await getHistory(
+      mockClient,
+      'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL',
+      { limit: 10 },
+    );
     expect(result).toHaveLength(1);
     expect(result[0]?.hash).toBe('txhash1');
     expect(result[0]?.ledger).toBe(12345);
@@ -50,7 +54,9 @@ describe('getHistory', () => {
       withTimeout: (p: Promise<unknown>) => p,
     } as unknown as StellarClient;
 
-    await getHistory(client, 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL', { cursor: 'tok-123' });
+    await getHistory(client, 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL', {
+      cursor: 'tok-123',
+    });
     expect(cursorMock).toHaveBeenCalledWith('tok-123');
   });
 

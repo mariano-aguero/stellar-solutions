@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { getNetworkConfig, HORIZON_URLS, SOROBAN_RPC_URLS } from '../network.js';
+import { describe, expect, it } from 'vitest';
+import { HORIZON_URLS, SOROBAN_RPC_URLS, getNetworkConfig } from '../network.js';
 
 describe('getNetworkConfig', () => {
   it('returns testnet config', () => {

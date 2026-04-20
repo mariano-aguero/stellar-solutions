@@ -1,5 +1,5 @@
-import { Asset, Keypair, Networks, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { StellarClient } from '@stellar-solutions/core';
+import { Asset, Keypair, Networks, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
 import { fundAccount } from './funding.js';
 import { validateAssetCode, validateTotalSupply } from './validators.js';
 
@@ -41,15 +41,18 @@ export async function createAsset(
   const distributorKeypair = Keypair.random();
   // Exact passphrase match — custom/standalone networks don't map to a Stellar Expert URL.
   const networkLabel: 'testnet' | 'mainnet' | null =
-    client.networkConfig.networkPassphrase === Networks.PUBLIC ? 'mainnet' :
-    client.networkConfig.networkPassphrase === Networks.TESTNET ? 'testnet' :
-    null;
+    client.networkConfig.networkPassphrase === Networks.PUBLIC
+      ? 'mainnet'
+      : client.networkConfig.networkPassphrase === Networks.TESTNET
+        ? 'testnet'
+        : null;
   const txHashes: string[] = [];
 
   // Fund both accounts
-  const fundingOptions = options.startingBalance !== undefined
-    ? { fundingSecretKey: options.fundingSecretKey, startingBalance: options.startingBalance }
-    : { fundingSecretKey: options.fundingSecretKey };
+  const fundingOptions =
+    options.startingBalance !== undefined
+      ? { fundingSecretKey: options.fundingSecretKey, startingBalance: options.startingBalance }
+      : { fundingSecretKey: options.fundingSecretKey };
   await fundAccount(client, issuerKeypair.publicKey(), fundingOptions);
   await fundAccount(client, distributorKeypair.publicKey(), fundingOptions);
 
@@ -67,9 +70,7 @@ export async function createAsset(
     .setTimeout(180)
     .build();
   trustlineTx.sign(distributorKeypair);
-  const trustlineResult = await client.withTimeout(
-    client.horizon.submitTransaction(trustlineTx),
-  );
+  const trustlineResult = await client.withTimeout(client.horizon.submitTransaction(trustlineTx));
   txHashes.push(trustlineResult.hash);
 
   // Mint: issuer sends totalSupply to distributor
@@ -90,9 +91,7 @@ export async function createAsset(
     .setTimeout(180)
     .build();
   mintTx.sign(issuerKeypair);
-  const mintResult = await client.withTimeout(
-    client.horizon.submitTransaction(mintTx),
-  );
+  const mintResult = await client.withTimeout(client.horizon.submitTransaction(mintTx));
   txHashes.push(mintResult.hash);
 
   // Lock issuer if requested
@@ -108,20 +107,21 @@ export async function createAsset(
       .setTimeout(180)
       .build();
     lockTx.sign(issuerKeypair);
-    const lockResult = await client.withTimeout(
-      client.horizon.submitTransaction(lockTx),
-    );
+    const lockResult = await client.withTimeout(client.horizon.submitTransaction(lockTx));
     txHashes.push(lockResult.hash);
   }
 
   // Secret keys are set as non-enumerable so they don't appear in JSON.stringify or console.log.
   // They remain accessible via direct property access (result.issuerSecretKey).
-  const result: Omit<AssetResult, 'issuerSecretKey' | 'distributorSecretKey'> & Partial<Pick<AssetResult, 'issuerSecretKey' | 'distributorSecretKey'>> = {
+  const result: Omit<AssetResult, 'issuerSecretKey' | 'distributorSecretKey'> &
+    Partial<Pick<AssetResult, 'issuerSecretKey' | 'distributorSecretKey'>> = {
     assetCode: options.code,
     issuerAddress: issuerKeypair.publicKey(),
     distributorAddress: distributorKeypair.publicKey(),
     ...(networkLabel !== null
-      ? { explorerUrl: `https://stellar.expert/explorer/${networkLabel}/asset/${options.code}-${issuerKeypair.publicKey()}` }
+      ? {
+          explorerUrl: `https://stellar.expert/explorer/${networkLabel}/asset/${options.code}-${issuerKeypair.publicKey()}`,
+        }
       : {}),
     txHashes,
   };

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Keypair } from '@stellar/stellar-sdk';
 import type { StellarClient } from '@stellar-solutions/core';
-import { InvalidAssetCodeError, InvalidAmountError } from '@stellar-solutions/core';
+import { InvalidAmountError, InvalidAssetCodeError } from '@stellar-solutions/core';
+import { Keypair } from '@stellar/stellar-sdk';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createAsset } from '../createAsset.js';
 
 // Use a real public key so TransactionBuilder.build() is satisfied
@@ -55,19 +55,23 @@ describe('createAsset', () => {
 
   it('throws InvalidAssetCodeError for invalid asset code', async () => {
     const client = makeMockClient();
-    await expect(createAsset(client, {
-      code: 'invalid!',
-      totalSupply: '1000',
-      fundingSecretKey: 'SCN6I4YH2IR7SZ6RHYQMI2TCTS4VXG6MGS4APWXYEUH26VFMYPQMUT5A',
-    })).rejects.toThrow(InvalidAssetCodeError);
+    await expect(
+      createAsset(client, {
+        code: 'invalid!',
+        totalSupply: '1000',
+        fundingSecretKey: 'SCN6I4YH2IR7SZ6RHYQMI2TCTS4VXG6MGS4APWXYEUH26VFMYPQMUT5A',
+      }),
+    ).rejects.toThrow(InvalidAssetCodeError);
   });
 
   it('throws InvalidAmountError for zero totalSupply', async () => {
     const client = makeMockClient();
-    await expect(createAsset(client, {
-      code: 'TSTKN',
-      totalSupply: '0',
-      fundingSecretKey: 'SCN6I4YH2IR7SZ6RHYQMI2TCTS4VXG6MGS4APWXYEUH26VFMYPQMUT5A',
-    })).rejects.toThrow(InvalidAmountError);
+    await expect(
+      createAsset(client, {
+        code: 'TSTKN',
+        totalSupply: '0',
+        fundingSecretKey: 'SCN6I4YH2IR7SZ6RHYQMI2TCTS4VXG6MGS4APWXYEUH26VFMYPQMUT5A',
+      }),
+    ).rejects.toThrow(InvalidAmountError);
   });
 });

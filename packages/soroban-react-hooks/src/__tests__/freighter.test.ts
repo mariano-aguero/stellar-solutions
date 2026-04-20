@@ -1,5 +1,5 @@
-import { vi, describe, it, expect } from 'vitest';
 import { FreighterNotInstalledError, NetworkMismatchError } from '@stellar-solutions/core';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@stellar/freighter-api', () => ({
   isConnected: vi.fn(),
@@ -19,13 +19,19 @@ describe('getFreighterAddress', () => {
 
   it('throws NetworkMismatchError when on wrong network', async () => {
     vi.mocked(FreighterAPI.isConnected).mockResolvedValue({ isConnected: true });
-    vi.mocked(FreighterAPI.getNetwork).mockResolvedValue({ network: 'mainnet', networkPassphrase: '' });
+    vi.mocked(FreighterAPI.getNetwork).mockResolvedValue({
+      network: 'mainnet',
+      networkPassphrase: '',
+    });
     await expect(getFreighterAddress('testnet')).rejects.toThrow(NetworkMismatchError);
   });
 
   it('returns address when connected and on correct network', async () => {
     vi.mocked(FreighterAPI.isConnected).mockResolvedValue({ isConnected: true });
-    vi.mocked(FreighterAPI.getNetwork).mockResolvedValue({ network: 'testnet', networkPassphrase: '' });
+    vi.mocked(FreighterAPI.getNetwork).mockResolvedValue({
+      network: 'testnet',
+      networkPassphrase: '',
+    });
     vi.mocked(FreighterAPI.getAddress).mockResolvedValue({ address: 'GABC123', error: '' });
     const address = await getFreighterAddress('testnet');
     expect(address).toBe('GABC123');

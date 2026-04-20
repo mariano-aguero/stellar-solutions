@@ -1,6 +1,6 @@
-import { Keypair, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
 import type { StellarClient } from '@stellar-solutions/core';
 import { FundingError } from '@stellar-solutions/core';
+import { Keypair, Operation, TransactionBuilder } from '@stellar/stellar-sdk';
 
 export interface FundingOptions {
   fundingSecretKey: string;
@@ -21,7 +21,9 @@ export async function fundAccount(
     );
     if (!response.ok) {
       const body = await response.text();
-      throw new FundingError(`Friendbot failed (${response.status}): ${body}`, { status: response.status });
+      throw new FundingError(`Friendbot failed (${response.status}): ${body}`, {
+        status: response.status,
+      });
     }
     return;
   }
@@ -29,9 +31,7 @@ export async function fundAccount(
   // Mainnet: submit createAccount operation
   const fundingKeypair = Keypair.fromSecret(options.fundingSecretKey);
   const fundingAddress = fundingKeypair.publicKey();
-  const fundingAccount = await client.withTimeout(
-    client.horizon.loadAccount(fundingAddress),
-  );
+  const fundingAccount = await client.withTimeout(client.horizon.loadAccount(fundingAddress));
 
   const tx = new TransactionBuilder(fundingAccount, {
     fee: '100',

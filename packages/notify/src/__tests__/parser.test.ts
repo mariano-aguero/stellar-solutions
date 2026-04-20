@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { parseOp } from '../parser.js';
 import type { HorizonOperation } from '../types.js';
 
@@ -54,7 +54,7 @@ describe('parseOp', () => {
       from: 'GSOURCE',
       to: 'GDEST',
       amount: '100.0000000', // source amount (ignored)
-      asset_type: 'native',  // source asset (ignored)
+      asset_type: 'native', // source asset (ignored)
       dest_amount: '42.5000000',
       to_asset_type: 'credit_alphanum4',
       to_asset_code: 'USDC',

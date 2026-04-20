@@ -1,4 +1,8 @@
-import { useWallet, useSorobanBalance, useSorobanInvoke } from '@stellar-solutions/soroban-react-hooks';
+import {
+  useSorobanBalance,
+  useSorobanInvoke,
+  useWallet,
+} from '@stellar-solutions/soroban-react-hooks';
 
 // Testnet SAC contract for USDC on Stellar
 const SAC_CONTRACT_ID = 'CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCPTUEPFM4AVSRCJU';
@@ -10,7 +14,9 @@ export function App() {
   const { invoke, isPending } = useSorobanInvoke(SAC_CONTRACT_ID, 'transfer');
 
   return (
-    <div style={{ fontFamily: 'sans-serif', maxWidth: 480, margin: '40px auto', padding: '0 16px' }}>
+    <div
+      style={{ fontFamily: 'sans-serif', maxWidth: 480, margin: '40px auto', padding: '0 16px' }}
+    >
       <h1>Stellar Soroban Hooks Demo</h1>
 
       {!isConnected ? (
@@ -19,12 +25,13 @@ export function App() {
         </button>
       ) : (
         <div>
-          <p><strong>Address:</strong> {address}</p>
-          <p><strong>Balance:</strong> {balance ?? '...'} USDC</p>
-          <button
-            onClick={() => void invoke([DEMO_DESTINATION, '1', '7'])}
-            disabled={isPending}
-          >
+          <p>
+            <strong>Address:</strong> {address}
+          </p>
+          <p>
+            <strong>Balance:</strong> {balance ?? '...'} USDC
+          </p>
+          <button onClick={() => void invoke([DEMO_DESTINATION, '1', '7'])} disabled={isPending}>
             {isPending ? 'Sending...' : 'Transfer 1 USDC'}
           </button>
           <button onClick={disconnect} style={{ marginLeft: 8 }}>

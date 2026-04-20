@@ -1,5 +1,5 @@
-import { Asset } from '@stellar/stellar-sdk';
 import type { StellarClient } from '@stellar-solutions/core';
+import { Asset } from '@stellar/stellar-sdk';
 
 export interface Holder {
   address: string;

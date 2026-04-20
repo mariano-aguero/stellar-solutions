@@ -1,9 +1,9 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { createClient } from '@stellar-solutions/core';
 import type { Network } from '@stellar-solutions/core';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { SorobanContext } from './SorobanContext.js';
 
 interface SorobanProviderProps {
@@ -24,12 +24,14 @@ export function SorobanProvider({ network, children, queryClient }: SorobanProvi
 
   // Clear the wallet address whenever the network changes — an address authenticated
   // against testnet must not silently appear connected after switching to mainnet.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: setWalletAddress is a stable useState setter
   useEffect(() => {
     setWalletAddress(null);
   }, [network]);
 
   // Memoize the context value so consumers don't re-render when SorobanProvider's parent
-  // re-renders but none of the context inputs changed.
+  // re-renders but none of the context inputs changed. setWalletAddress is a stable
+  // useState setter so it doesn't need to be tracked as a dep.
   const contextValue = useMemo(
     () => ({ client, network, walletAddress, setWalletAddress }),
     [client, network, walletAddress],

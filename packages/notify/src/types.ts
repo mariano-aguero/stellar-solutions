@@ -5,7 +5,7 @@ export interface PaymentEvent {
   from: string;
   to: string;
   amount: string;
-  asset: string;  // 'native' or 'USDC:GISSUER...'
+  asset: string; // 'native' or 'USDC:GISSUER...'
   createdAt: string;
 }
 

@@ -1,9 +1,9 @@
-import { vi, describe, it, expect } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { useSorobanBalance } from '../hooks/useSorobanBalance.js';
 import { QueryClient } from '@tanstack/react-query';
-import { SorobanProvider } from '../context/SorobanProvider.js';
+import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { describe, expect, it, vi } from 'vitest';
+import { SorobanProvider } from '../context/SorobanProvider.js';
+import { useSorobanBalance } from '../hooks/useSorobanBalance.js';
 
 const VALID_ADDRESS = 'GCKG2FITNKLHYMKLUQW3ZDTC2CWZ6LTZ2R76TEFJQO7XHDFNTOJD5SYL';
 
@@ -48,27 +48,28 @@ vi.mock('@stellar-solutions/core', async (importOriginal) => {
 function makeWrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return function Wrapper({ children }: { children: ReactNode }) {
-    return <SorobanProvider network="testnet" queryClient={qc}>{children}</SorobanProvider>;
+    return (
+      <SorobanProvider network="testnet" queryClient={qc}>
+        {children}
+      </SorobanProvider>
+    );
   };
 }
 
 describe('useSorobanBalance', () => {
   it('is disabled when address is null', () => {
-    const { result } = renderHook(
-      () => useSorobanBalance('CONTRACT_ID', null),
-      { wrapper: makeWrapper() },
-    );
+    const { result } = renderHook(() => useSorobanBalance('CONTRACT_ID', null), {
+      wrapper: makeWrapper(),
+    });
     expect(result.current.fetchStatus).toBe('idle');
   });
 
   it('returns balance string when address is provided', async () => {
-    const { result } = renderHook(
-      () => useSorobanBalance('CONTRACT_ID', VALID_ADDRESS),
-      { wrapper: makeWrapper() },
-    );
+    const { result } = renderHook(() => useSorobanBalance('CONTRACT_ID', VALID_ADDRESS), {
+      wrapper: makeWrapper(),
+    });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(typeof result.current.data).toBe('string');
     expect(result.current.data).toBe('1000000');
   });
-
 });

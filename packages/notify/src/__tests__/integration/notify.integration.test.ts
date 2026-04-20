@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { StellarNotify } from '../../StellarNotify.js';
 import type { PaymentEvent } from '../../types.js';
 

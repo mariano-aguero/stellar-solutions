@@ -1,6 +1,6 @@
 import { Horizon, rpc as RpcModule } from '@stellar/stellar-sdk';
-import { getNetworkConfig, type Network, type NetworkConfig } from './network.js';
 import { NetworkTimeoutError } from './errors.js';
+import { type Network, type NetworkConfig, getNetworkConfig } from './network.js';
 
 export interface StellarClient {
   horizon: Horizon.Server;

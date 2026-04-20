@@ -31,4 +31,4 @@ console.log(`  Explorer: https://stellar.expert/explorer/testnet/tx/${result.has
 
 const history = await kit.getHistory(address, { limit: 3 });
 console.log('\nLast 3 transactions:');
-history.forEach((tx) => console.log(`  ${tx.hash} — ${tx.createdAt}`));
+for (const tx of history) console.log(`  ${tx.hash} — ${tx.createdAt}`);

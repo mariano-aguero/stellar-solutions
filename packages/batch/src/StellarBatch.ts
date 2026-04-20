@@ -1,10 +1,10 @@
 import { createClient } from '@stellar-solutions/core';
 import type { BatchPayment, BatchResult, Network, StellarClient } from '@stellar-solutions/core';
+import { ChannelPool } from './channels.js';
+import { estimate } from './estimator.js';
+import type { BatchEstimate } from './estimator.js';
 import { validateAndChunk } from './queue.js';
 import { ResultCollector } from './result-collector.js';
-import { estimate } from './estimator.js';
-import { ChannelPool } from './channels.js';
-import type { BatchEstimate } from './estimator.js';
 
 export interface StellarBatchOptions {
   secretKey: string;

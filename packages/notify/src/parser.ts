@@ -1,11 +1,21 @@
-import type { HorizonOperation, StellarEvent, PaymentEvent, SorobanEvent, OtherEvent } from './types.js';
+import type {
+  HorizonOperation,
+  OtherEvent,
+  PaymentEvent,
+  SorobanEvent,
+  StellarEvent,
+} from './types.js';
 
 function assetString(assetType?: string, assetCode?: string, assetIssuer?: string): string {
   if (!assetType || assetType === 'native') return 'native';
   return `${assetCode ?? ''}:${assetIssuer ?? ''}`;
 }
 
-const PAYMENT_OP_TYPES = new Set(['payment', 'path_payment_strict_send', 'path_payment_strict_receive']);
+const PAYMENT_OP_TYPES = new Set([
+  'payment',
+  'path_payment_strict_send',
+  'path_payment_strict_receive',
+]);
 
 function toPaymentFields(op: HorizonOperation): { amount: string; asset: string } {
   // For path_payment_strict_send, `amount` is the SOURCE amount — what the destination

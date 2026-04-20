@@ -1,7 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { estimate } from '../estimator.js';
 
-const payment = { to: 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN', amount: '1.0', asset: 'native' as const };
+const payment = {
+  to: 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN',
+  amount: '1.0',
+  asset: 'native' as const,
+};
 
 describe('estimate', () => {
   it('single payment → txCount: 1', () => {
@@ -28,7 +32,7 @@ describe('estimate', () => {
   it('returns estimatedFeeXLM as a decimal string', () => {
     const result = estimate([payment]);
     expect(typeof result.estimatedFeeXLM).toBe('string');
-    expect(parseFloat(result.estimatedFeeXLM)).toBeGreaterThan(0);
+    expect(Number.parseFloat(result.estimatedFeeXLM)).toBeGreaterThan(0);
   });
 
   it('returns estimatedTimeMs as a positive number', () => {

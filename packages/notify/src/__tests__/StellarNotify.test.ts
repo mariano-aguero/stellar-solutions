@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { StellarNotify } from '../StellarNotify.js';
 
 vi.mock('../watcher.js', () => ({

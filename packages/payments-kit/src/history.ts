@@ -1,5 +1,5 @@
-import type { StellarClient, HistoryEntry, Asset } from '@stellar-solutions/core';
-import { isValidAddress, InvalidAddressError } from '@stellar-solutions/core';
+import type { Asset, HistoryEntry, StellarClient } from '@stellar-solutions/core';
+import { InvalidAddressError, isValidAddress } from '@stellar-solutions/core';
 
 export interface HistoryOptions {
   limit?: number;
@@ -56,7 +56,9 @@ export async function getHistory(
           createdAt: String(record['created_at'] ?? ''),
           // ledger is omitted — the /payments endpoint doesn't expose ledger sequence
           ...(typeof record['amount'] === 'string' ? { amount: record['amount'] } : {}),
-          ...(typeof record['starting_balance'] === 'string' ? { amount: record['starting_balance'] } : {}),
+          ...(typeof record['starting_balance'] === 'string'
+            ? { amount: record['starting_balance'] }
+            : {}),
           ...(asset !== undefined ? { asset } : {}),
           ...(typeof record['from'] === 'string' ? { from: record['from'] } : {}),
           ...(typeof record['source_account'] === 'string' && record['from'] === undefined

@@ -1,7 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ResultCollector } from '../result-collector.js';
 
-const payment = { to: 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN', amount: '1.0', asset: 'native' as const };
+const payment = {
+  to: 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN',
+  amount: '1.0',
+  asset: 'native' as const,
+};
 
 describe('ResultCollector', () => {
   it('starts empty', () => {

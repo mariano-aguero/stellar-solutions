@@ -7,12 +7,7 @@
     "type": "git",
     "url": "https://github.com/mariano-aguero/stellar-solutions"
   },
-  "keywords": [
-    "stellar",
-    "events",
-    "webhook",
-    "notify"
-  ],
+  "keywords": ["stellar", "events", "webhook", "notify"],
   "type": "module",
   "exports": {
     ".": {
@@ -23,10 +18,7 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

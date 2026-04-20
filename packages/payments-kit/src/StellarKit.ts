@@ -1,8 +1,8 @@
-import { createClient, type ClientOptions, type StellarClient } from '@stellar-solutions/core';
-import type { TxResult, HistoryEntry, Asset, Network } from '@stellar-solutions/core';
-import { pay, type PaymentOptions } from './pay.js';
+import { type ClientOptions, type StellarClient, createClient } from '@stellar-solutions/core';
+import type { Asset, HistoryEntry, Network, TxResult } from '@stellar-solutions/core';
 import { getBalance } from './balance.js';
-import { getHistory, type HistoryOptions } from './history.js';
+import { type HistoryOptions, getHistory } from './history.js';
+import { type PaymentOptions, pay } from './pay.js';
 
 export interface StellarKitOptions extends ClientOptions {
   network: Network;

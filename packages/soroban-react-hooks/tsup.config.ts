@@ -6,7 +6,13 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom', '@stellar/stellar-sdk', '@stellar/freighter-api', '@tanstack/react-query'],
+  external: [
+    'react',
+    'react-dom',
+    '@stellar/stellar-sdk',
+    '@stellar/freighter-api',
+    '@tanstack/react-query',
+  ],
   esbuildOptions(options) {
     options.jsx = 'automatic';
   },

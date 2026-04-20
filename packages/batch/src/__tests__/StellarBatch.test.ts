@@ -1,7 +1,7 @@
-import { vi, describe, it, expect } from 'vitest';
-import { StellarBatch } from '../StellarBatch.js';
-import { EmptyBatchError, BatchValidationError } from '@stellar-solutions/core';
+import { BatchValidationError, EmptyBatchError } from '@stellar-solutions/core';
 import { Keypair } from '@stellar/stellar-sdk';
+import { describe, expect, it, vi } from 'vitest';
+import { StellarBatch } from '../StellarBatch.js';
 
 vi.mock('../channels.js', () => ({
   ChannelPool: vi.fn().mockImplementation(() => ({
@@ -38,7 +38,9 @@ describe('StellarBatch', () => {
 
   it('send() throws BatchValidationError for invalid address', async () => {
     const batch = new StellarBatch({ secretKey: VALID_SECRET, network: 'testnet' });
-    await expect(batch.send([{ ...validPayment, to: 'BAD_ADDRESS' }])).rejects.toThrow(BatchValidationError);
+    await expect(batch.send([{ ...validPayment, to: 'BAD_ADDRESS' }])).rejects.toThrow(
+      BatchValidationError,
+    );
   });
 
   it('estimate() returns BatchEstimate without network calls', () => {

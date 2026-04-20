@@ -1,8 +1,8 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import type { StellarClient } from '@stellar-solutions/core';
 import { Keypair } from '@stellar/stellar-sdk';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChannelPool } from '../channels.js';
 import { ResultCollector } from '../result-collector.js';
-import type { StellarClient } from '@stellar-solutions/core';
 
 // Mock executeChunks to avoid real network calls
 vi.mock('../executor.js', () => ({
@@ -39,11 +39,21 @@ describe('ChannelPool', () => {
     const chunks = [[payment], [payment]];
     await pool.executeWithChannels(mockClient, chunks, collector);
     expect(executeChunks).toHaveBeenCalledTimes(1);
-    expect(executeChunks).toHaveBeenCalledWith(mockClient, expect.any(Keypair), chunks, collector, {});
+    expect(executeChunks).toHaveBeenCalledWith(
+      mockClient,
+      expect.any(Keypair),
+      chunks,
+      collector,
+      {},
+    );
   });
 
   it('3 channels: runs 3 chunks concurrently (Promise.all)', async () => {
-    const secrets = [Keypair.random().secret(), Keypair.random().secret(), Keypair.random().secret()];
+    const secrets = [
+      Keypair.random().secret(),
+      Keypair.random().secret(),
+      Keypair.random().secret(),
+    ];
     const pool = new ChannelPool(secrets);
     const collector = new ResultCollector();
     // 3 chunks → all 3 dispatched in one Promise.all batch
@@ -52,7 +62,7 @@ describe('ChannelPool', () => {
     // Mock executeChunks to record calls with timing
     const callOrder: number[] = [];
     (executeChunks as ReturnType<typeof vi.fn>).mockImplementation(async (_c, _k, [chunk]) => {
-      callOrder.push(chunks.indexOf(chunk as typeof payment[]));
+      callOrder.push(chunks.indexOf(chunk as (typeof payment)[]));
     });
 
     await pool.executeWithChannels(mockClient, chunks, collector);

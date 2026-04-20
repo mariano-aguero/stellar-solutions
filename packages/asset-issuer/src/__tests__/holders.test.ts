@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { StellarClient } from '@stellar-solutions/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getHolders } from '../holders.js';
 
 // Valid Stellar public keys (56 chars, base32 starting with G)
@@ -21,7 +21,9 @@ const mockClient = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (mockClient.horizon as unknown as { accounts: ReturnType<typeof vi.fn> }).accounts.mockReturnValue(mockAccounts);
+  (
+    mockClient.horizon as unknown as { accounts: ReturnType<typeof vi.fn> }
+  ).accounts.mockReturnValue(mockAccounts);
   mockAccounts.forAsset.mockReturnThis();
   mockAccounts.limit.mockReturnThis();
   mockAccounts.cursor.mockReturnThis();
@@ -114,9 +116,7 @@ describe('getHolders', () => {
     });
 
     expect(holders).toHaveLength(1);
-    expect(holders[0]!.address).toBe(
-      'GABC000000000000000000000000000000000000000000000000000001',
-    );
+    expect(holders[0]!.address).toBe('GABC000000000000000000000000000000000000000000000000000001');
   });
 
   it('paginates through multiple pages', async () => {

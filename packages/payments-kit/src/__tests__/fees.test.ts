@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
 import type { StellarClient } from '@stellar-solutions/core';
+import { describe, expect, it, vi } from 'vitest';
 import { estimateFee } from '../fees.js';
 
 const mockClient = {
